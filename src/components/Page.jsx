@@ -19,7 +19,7 @@ export const CardGrid = ({ dataSource, action }) => {
                 height={128}
                 fallback={AppConfig.fallbackImage}
                 src={`${item.icon}.png`}
-                onClick={() => action.current.unshift({ act: 'MOD_SELECT', url: `${item.icon}.FBX` })}
+                onClick={() => action.current.unshift({ act: 'MOD_SELECT', url: `${item.icon}.FBX`, detail: { name: `${item.name}`, color: '' } })}
               />
               <h5>{item.name}</h5>
             </div>

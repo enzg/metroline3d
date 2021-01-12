@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react'
 import { Html, useFBX } from '@react-three/drei'
 import { DoubleSide, MathUtils, Vector3 } from 'three'
 import { getFileExt, useMods } from '../Helper'
+import { Card } from 'antd'
+import { useFrame } from 'react-three-fiber'
 export default ({ path, position, mt, pt }) => {
   let mod = useFBX(path)
   mod.name = getFileExt(path)
@@ -25,9 +27,8 @@ export default ({ path, position, mt, pt }) => {
   })
   return <primitive object={mod} position={position || [0, 0, 0]} />
 }
-export const DynamicModel = ({ pathList, detail, ctrl, position, toggle, ft }) => {
+export const DynamicModel = ({ pathList, detail, ctrl, htmlCtrl, position, toggle, ft }) => {
   const { modList } = useMods({ pathList })
-  console.log(modList.current)
   if (modList.current.length) {
     return modList.current.map((mod) => {
       mod.traverse((m) => {
@@ -44,7 +45,7 @@ export const DynamicModel = ({ pathList, detail, ctrl, position, toggle, ft }) =
       })
 
       if (ctrl) {
-        return <InteractMod mod={mod} ctrl={ctrl} position={position || [0, 0, 0]} key={MathUtils.generateUUID()} />
+        return <InteractMod mod={mod} detail={detail} ctrl={ctrl} htmlCtrl={htmlCtrl} position={position || [0, 0, 0]} key={MathUtils.generateUUID()} />
       } else if (detail && position) {
         return <DetailMod mod={mod} detail={detail} position={position} key={mod.uuid} toggle={toggle} ft={ft} />
       } else {
@@ -81,7 +82,7 @@ function DetailMod({ mod, detail, position, ft, toggle: toggleDetail }) {
         return <primitive object={m} attachArray="children" key={m.uuid} />
 
       })}
-      <Html className="flag" style={{ transform: 'translate(0,-50px)' }}>
+      <Html position className="flag" style={{ transform: 'translate(0,-50px)' }}>
         <div style={flagStyle}>
           {detail.name}
         </div>
@@ -91,8 +92,10 @@ function DetailMod({ mod, detail, position, ft, toggle: toggleDetail }) {
 
 }
 
-function InteractMod({ mod, ctrl, position }) {
+function InteractMod({ mod, ctrl, htmlCtrl, position, detail }) {
   const modGroup = useRef()
+  const modNameFlag = useRef()
+  const modNameStyle = { padding: '2px 6px', textAlign: 'center', minWidth: '85px', backgroundColor: 'rgba(0,0,0,0.35)', color: '#00ff00', fontSize: '8px', fontWeight: 700 }
   return (
     <group
       ref={modGroup}
@@ -103,10 +106,18 @@ function InteractMod({ mod, ctrl, position }) {
           ctrl.current.detach()
           ctrl.current.attach(modGroup.current)
         }
+        if (htmlCtrl && htmlCtrl.current) {
+          htmlCtrl.current.classList.remove('hide')
+        }
       }}>
       {mod.children.map((m) => (
         <primitive object={m} attachArray="children" key={m.uuid} />
       ))}
+      <Html ref={modNameFlag} className="mod-name-flag" style={{ transform: 'translate(0,-50px)' }}>
+        <div style={modNameStyle}>
+          {detail.name}
+        </div>
+      </Html>
     </group>
   )
 }

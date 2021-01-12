@@ -1,10 +1,12 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { Html, OrbitControls, TransformControls } from '@react-three/drei'
 import { useFrame, useThree } from 'react-three-fiber'
-import { MathUtils, Vector3 } from 'three'
+import { MathUtils, MeshPhongMaterial, MeshPhysicalMaterial, Vector3 } from 'three'
 import { DynamicModel } from './Model'
-import { Button, Card } from 'antd'
+import { Button, Card, Radio, Divider } from 'antd'
 import { CloseCircleFilled } from '@ant-design/icons'
+import Draggable from 'react-draggable'
+import { CompactPicker } from 'react-color'
 const player = {
   height: 100.0,
   speed: 4.0,
@@ -17,6 +19,8 @@ export default ({ mt, action, pt }) => {
   //const planeRef = useRef()
   const keyboard = useRef({})
   const trans = useRef()
+  const htmlCtrl = useRef()
+  const transMode = useRef('translate')
   const orb = useRef()
   const flagTree = useRef([])
   const [modList, setModList] = useState([])
@@ -69,12 +73,40 @@ export default ({ mt, action, pt }) => {
           </Card>
         </Html>
       }
+      <Html ref={htmlCtrl} className="mod-ctl-pan hide">
+        <Draggable>
+          <Card title="控制面板" size="small" style={{ width: '30vh' }}>
+            <div style={{ marginBottom: '1vh' }}>
+              <Radio.Group defaultValue={transMode.current} buttonStyle="solid" onChange={(evt) => {
+                trans.current.mode = evt.target.value
+                transMode.current = evt.target.value
+              }}>
+                <Radio.Button value="translate">平移</Radio.Button>
+                <Radio.Button value="rotate">旋转</Radio.Button>
+                <Radio.Button value="scale">缩放</Radio.Button>
+              </Radio.Group>
+            </div>
+            <CompactPicker onChange={(evt) => {
+              action.current.unshift({ act: 'CHANGE_COLOR', color: evt.hex })
+              if (trans.current.object) {
+                trans.current.object.traverse(m => {
+                  if (m.type === 'Mesh') {
+                    m.material.color.set(evt.hex)
+                  }
+                })
+              }
+            }} />
+            <Divider />
+            <Button>保存</Button>
+            <Button>删除</Button>
+          </Card>
+        </Draggable>
+      </Html>
       <TransformControls ref={trans} position={[0, 3000000, 0]} />
       <Suspense fallback={null}>{modList}</Suspense>
-      <mesh ref={rollOverRef} onDoubleClick={() => {
+      <mesh ref={rollOverRef} position={[0, 3000000, 0]} onDoubleClick={() => {
         if (action.current[0] && action.current[0]['act'] === 'FLAG_SELECT') {
           let pos = rollOverRef.current.position
-          console.log(action.current[0]['url'])
           setModList(
             modList.concat(
               <DynamicModel
@@ -96,7 +128,9 @@ export default ({ mt, action, pt }) => {
                 position={[pos[0], 0, pos[2]]}
                 pathList={[action.current[0]['url']]}
                 ctrl={trans}
+                htmlCtrl={htmlCtrl}
                 key={MathUtils.generateUUID()}
+                detail={action.current[0]['detail']}
               />
             )
           )

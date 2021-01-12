@@ -18,8 +18,8 @@ export default () => {
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
-      <gridHelper args={[500000, 50]} />
-      <axesHelper args={[1000]} />
+      {/* <gridHelper args={[500000, 50]} />
+      <axesHelper args={[1000]} /> */}
     </>
   )
 }
