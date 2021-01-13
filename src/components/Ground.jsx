@@ -12,6 +12,13 @@ const player = {
   speed: 4.0,
   turnSpeed: Math.PI * 0.02
 }
+const closeButtonStyle = {
+  border: 'none',
+  position: 'absolute',
+  top: '2px',
+  right: '2px',
+  zIndex: 22222223
+}
 export default ({ mt, action, pt }) => {
   const [flagDetail, toggle] = useState(false)
   const { camera, mouse, raycaster } = useThree()
@@ -64,6 +71,10 @@ export default ({ mt, action, pt }) => {
       }
     }
   })
+  const X0 = () => <Button onClick={() => {
+    trans.current.detach()
+    htmlCtrl.current.classList.add('hide')
+  }} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
   return (
     <>
       {
@@ -73,9 +84,10 @@ export default ({ mt, action, pt }) => {
           </Card>
         </Html>
       }
-      <Html ref={htmlCtrl} className="mod-ctl-pan hide">
+      <Html ref={htmlCtrl} className="mod-ctl-pan hide" style={{ height: '0', width: '0' }}>
         <Draggable>
           <Card title="控制面板" size="small" style={{ width: '30vh' }}>
+            <X0 />
             <div style={{ marginBottom: '1vh' }}>
               <Radio.Group defaultValue={transMode.current} buttonStyle="solid" onChange={(evt) => {
                 trans.current.mode = evt.target.value
@@ -257,21 +269,6 @@ function playerMove(camera, keyboard) {
 }
 
 function X({ toggle }) {
-  const closeButtonStyle = {
-    border: 'none',
-    position: 'absolute',
-    top: '2px',
-    right: '2px',
-    zIndex: 22222223
-
-  }
-  return <Button
-    onClick={() => {
-      toggle(false)
-      // document.querySelectorAll('.flag').forEach(flag => flag.classList.toggle('hide'))
-    }}
-    ghost
-    style={closeButtonStyle}
-    icon={<CloseCircleFilled />} />
-
+  return <Button onClick={() => { toggle(false) }} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
 }
+
