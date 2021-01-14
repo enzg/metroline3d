@@ -19,17 +19,15 @@ const closeButtonStyle = {
   right: '2px',
   zIndex: 22222223
 }
-export default ({ mt, action, pt }) => {
-  const [flagDetail, toggle] = useState(false)
+export default ({ mt, action, pt, toggle }) => {
   const { camera, mouse, raycaster } = useThree()
   const rollOverRef = useRef()
-  //const planeRef = useRef()
   const keyboard = useRef({})
   const trans = useRef()
   const htmlCtrl = useRef()
   const transMode = useRef('translate')
   const orb = useRef()
-  const flagTree = useRef([])
+  const flagTree = useRef({})
   const [modList, setModList] = useState([])
   useEffect(() => {
     const keyUp = (evt) => {
@@ -40,7 +38,7 @@ export default ({ mt, action, pt }) => {
     }
     window.addEventListener('keydown', keyDown)
     window.addEventListener('keyup', keyUp)
-    playerSetup(camera)
+    playerSetup(camera, orb)
 
     trans.current.detach()
     trans.current.addEventListener('dragging-changed', (evt) => {
@@ -55,64 +53,71 @@ export default ({ mt, action, pt }) => {
   }, [camera])
   useFrame(() => {
     raycastUpdate(rollOverRef, raycaster, mouse, camera, action, mt, pt)
-    playerMove(camera, keyboard)
+    // playerMove(camera, keyboard)
     if (action && action.current[0]) {
-      if (action.current[0].act === 'HIDE_FLAG' && flagTree.current) {
-        flagTree.current.forEach(flag => {
+      if (action.current[0].act === 'HIDE_FLAG' && flagTree.current && Object.values(flagTree.current)) {
+        Object.values(flagTree.current).forEach(flag => {
           flag.current.visible = false
         })
         action.current.shift(0)
+        return
       }
-      if (action.current[0].act === 'SHOW_FLAG' && flagTree.current) {
-        flagTree.current.forEach(flag => {
+      if (action.current[0].act === 'SHOW_FLAG' && flagTree.current && Object.values(flagTree.current)) {
+        Object.values(flagTree.current).forEach(flag => {
           flag.current.visible = true
         })
         action.current.shift(0)
+        return
+      }
+      if (action.current[0].act === 'TRANSLATE') {
+        trans.current.mode = 'translate'
+        action.current.shift(0)
+        trans.current.showY = false
+        trans.current.showX = true
+        trans.current.showZ = true
+        return
+      }
+      if (action.current[0].act === 'ROTATE') {
+        trans.current.mode = 'rotate'
+        action.current.shift(0)
+        trans.current.showX = false
+        trans.current.showZ = false
+        trans.current.showY = true
+        return
+
+      }
+      if (action.current[0].act === 'SCALE') {
+        trans.current.mode = 'scale'
+        action.current.shift(0)
+        trans.current.showX = true
+        trans.current.showZ = true
+        trans.current.showY = true
+
+        return
+      }
+      if (action.current[0].act === 'CHANGE_COLOR') {
+
+        if (trans.current.object) {
+          trans.current.object.traverse(m => {
+            if (m.type === 'Mesh' && m.material.color) {
+              m.material.color.set(action.current[0].color)
+            }
+          })
+        }
+        action.current.shift(0)
+        return
+      }
+      if (action.current[0].act === 'DETACH') {
+        trans.current.detach()
+        action.current.shift(0)
+        return
+
       }
     }
   })
-  const X0 = () => <Button onClick={() => {
-    trans.current.detach()
-    htmlCtrl.current.classList.add('hide')
-  }} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
   return (
     <>
-      {
-        flagDetail && <Html center>
-          <Card size='small' title='详情' bodyStyle={{ width: '70vh', height: '50vh' }}>
-            <X toggle={toggle} />
-          </Card>
-        </Html>
-      }
-      <Html ref={htmlCtrl} className="mod-ctl-pan hide" style={{ height: '0', width: '0' }}>
-        <Draggable>
-          <Card title="控制面板" size="small" style={{ width: '30vh' }}>
-            <X0 />
-            <div style={{ marginBottom: '1vh' }}>
-              <Radio.Group defaultValue={transMode.current} buttonStyle="solid" onChange={(evt) => {
-                trans.current.mode = evt.target.value
-                transMode.current = evt.target.value
-              }}>
-                <Radio.Button value="translate">平移</Radio.Button>
-                <Radio.Button value="rotate">旋转</Radio.Button>
-                <Radio.Button value="scale">缩放</Radio.Button>
-              </Radio.Group>
-            </div>
-            <CompactPicker onChange={(evt) => {
-              action.current.unshift({ act: 'CHANGE_COLOR', color: evt.hex })
-              if (trans.current.object) {
-                trans.current.object.traverse(m => {
-                  if (m.type === 'Mesh') {
-                    m.material.color.set(evt.hex)
-                  }
-                })
-              }
-            }} />
-            <Divider />
-            <Button>保存</Button>
-            <Button>删除</Button>
-          </Card>
-        </Draggable>
+      <Html ref={htmlCtrl} className="mod-ctl-pan hide" style={{ height: '0', width: '0' }} prepend>
       </Html>
       <TransformControls ref={trans} position={[0, 3000000, 0]} />
       <Suspense fallback={null}>{modList}</Suspense>
@@ -131,6 +136,8 @@ export default ({ mt, action, pt }) => {
               />
             )
           )
+          action.current.shift()
+          return
         }
         if (action.current[0] && action.current[0]['act'] === 'MOD_SELECT') {
           let pos = rollOverRef.current.position.toArray()
@@ -146,6 +153,8 @@ export default ({ mt, action, pt }) => {
               />
             )
           )
+          action.current.shift()
+          return
         }
       }}>
         <boxBufferGeometry attach="geometry" args={[50, 50, 50]} />
@@ -153,39 +162,16 @@ export default ({ mt, action, pt }) => {
           attach="material"
           color="lightgreen"
           transparent
-          opacity={0.75}
+          opacity={0.5}
         />
       </mesh>
-      {/*
-      <mesh
-        onDoubleClick={(evt) => {
-          if (action.current[0] && action.current[0]['act'] === 'MOD_SELECT') {
-            const pos = evt.point.toArray()
-            setModList(
-              modList.concat(
-                <DynamicModel
-                  position={[pos[0], 0, pos[2]]}
-                  pathList={[action.current[0]['url']]}
-                  ctrl={trans}
-                  key={MathUtils.generateUUID()}
-                />
-              )
-            )
-          }
-        }}
-        ref={planeRef}
-        name="plane"
-        receiveShadow
-        rotation={[-0.5 * Math.PI, 0, 0]}>
-        <planeBufferGeometry attach="geometry" args={[800000, 800000]} />
-        <meshPhongMaterial transparent opacity={0} attach="material" />
-      </mesh>
-    */}
       <OrbitControls
+        target={[-25000, 100, 10000]}
+        center={new Vector3(-25000, 100, 10000)}
         ref={orb}
         enableDamping
         minPolarAngle={0}
-        maxPolarAngle={0.51 * Math.PI}
+        maxPolarAngle={0.48 * Math.PI}
       />
     </>
   )
@@ -231,23 +217,22 @@ function raycastUpdate(rollOverRef, raycaster, mouse, camera, action, mt, pt) {
   }
 }
 
-function playerSetup(camera) {
+function playerSetup(camera, orb) {
   camera.position.set(0, player.height, -5)
   camera.lookAt(new Vector3(0, player.height, 0))
-  camera.updateProjectionMatrix()
+  orb.current.target.set(camera.position.x, camera.position.y, camera.position.z)
+
 }
 function playerMove(camera, keyboard) {
   if (keyboard.current[87]) {
     // W key
     camera.position.x -= Math.sin(camera.rotation.y) * player.speed
     camera.position.z -= -Math.cos(camera.rotation.y) * player.speed
-    camera.updateProjectionMatrix()
   }
   if (keyboard.current[83]) {
     // S key
     camera.position.x += Math.sin(camera.rotation.y) * player.speed
     camera.position.z += -Math.cos(camera.rotation.y) * player.speed
-    camera.updateProjectionMatrix()
   }
   if (keyboard.current[65]) {
     // A key
@@ -256,7 +241,6 @@ function playerMove(camera, keyboard) {
       Math.sin(camera.rotation.y + Math.PI / 2) * player.speed
     camera.position.z +=
       -Math.cos(camera.rotation.y + Math.PI / 2) * player.speed
-    camera.updateProjectionMatrix()
   }
   if (keyboard.current[68]) {
     // D key
@@ -264,7 +248,6 @@ function playerMove(camera, keyboard) {
       Math.sin(camera.rotation.y - Math.PI / 2) * player.speed
     camera.position.z +=
       -Math.cos(camera.rotation.y - Math.PI / 2) * player.speed
-    camera.updateProjectionMatrix()
   }
 }
 

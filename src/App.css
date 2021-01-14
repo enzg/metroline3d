@@ -9,6 +9,10 @@ canvas {
   z-index: -100;
 }
 
+.mod-name-flag {
+  z-index: -100;
+}
+
 .hide {
   display: none;
 }

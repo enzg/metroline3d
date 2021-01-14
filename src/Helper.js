@@ -4,7 +4,10 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { AppConfig } from './Config'
 import axios from 'axios'
 Cache.enabled = true
-export const AppCtx = createContext('sunny')
+export const AppCtx = createContext({
+  weather: 'sunny',
+  tf: false
+})
 export function useMods({ pathList }) {
   const modList = useRef([])
   const loadingManager = useRef()
@@ -28,7 +31,6 @@ export function useMods({ pathList }) {
           (err) => fail(err)
         )
       }).then((mod) => {
-        console.log(mod)
         mod.name = `${mod.uuid}.${getFileExt(pathList[count])}`
         modList.current.push(mod.clone())
         Cache.add(cacheKey, mod)

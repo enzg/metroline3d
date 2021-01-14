@@ -15,11 +15,15 @@
     "@react-three/drei": "^2.2.15",
     "antd": "4.10.0",
     "axios": "0.21.1",
+    "d3": "^6.3.1",
     "react": "^17.0.1",
     "react-color": "^2.19.3",
     "react-dom": "^17.0.1",
     "react-draggable": "^4.4.3",
     "react-three-fiber": "^5.3.11",
     "three": "^0.124.0"
+  },
+  "devDependencies": {
+    "cssnano": "^4.1.10"
   }
 }

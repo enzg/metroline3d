@@ -105,3 +105,4 @@ dist
 *.un~
 *.lock
 package-lock.json
+*.zip

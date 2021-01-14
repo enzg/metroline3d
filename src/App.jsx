@@ -11,8 +11,10 @@ import { AppCtx } from "./Helper";
 export default () => {
   const action = useRef([])
   const [weather, setWeather] = useState('sunny')
+  const [tf, setTf] = useState(false)
+  const [flagDetail, toggle] = useState(false)
   return <div className="app-root">
-    <AppCtx.Provider value={{ weather, setWeather }}>
+    <AppCtx.Provider value={{ weather, setWeather, tf, setTf, flagDetail, toggle }}>
       <Hud action={action} />
       <World action={action} />
     </AppCtx.Provider>

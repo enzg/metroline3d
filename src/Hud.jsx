@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Button, Card, Col, Form, Input, Radio, Row, Switch, Tabs } from 'antd'
+import React, { useContext, useState } from 'react'
+import { Button, Card, Col, Form, Input, Radio, Row, Switch, Tabs, Divider } from 'antd'
 import { CheckOutlined, CloseCircleFilled, CloseOutlined, GoldenFilled, SaveFilled, MinusCircleFilled } from '@ant-design/icons'
 import {
   basicMenu,
@@ -7,19 +7,31 @@ import {
   buildingMenu,
   plantMenu,
   bridgeMenu,
+  eventMenu,
   Menus
 } from './Config'
-import { CardGrid, MpsAndRisksList, ProjGrid, SceneSetting } from './components/Page'
+import { CardGrid, FlagDetail, MpsAndRisksList, ProjGrid, SceneSetting } from './components/Page'
+import Draggable from 'react-draggable'
+import StreamGraph from './components/StreamGraph'
+import { CompactPicker } from 'react-color'
+import { AppCtx } from './Helper'
 const basicStyle = {
   width: '50vh',
   position: 'absolute',
   top: '5.5vh',
   left: '4.2vw',
   zIndex: 22222222
-
+}
+const closeButtonStyle = {
+  border: 'none',
+  position: 'absolute',
+  top: '2px',
+  right: '2px',
+  zIndex: 22222223
 }
 export default ({ action }) => {
   const [link, linkTo] = useState(null)
+  const { flagDetail } = useContext(AppCtx)
   return <>
     <div className="top-nav">
       <div className="top-band">
@@ -38,11 +50,44 @@ export default ({ action }) => {
       }
     </div>
     <Route link={link} linkTo={linkTo} action={action} />
+    <div style={{ position: 'absolute', right: '1vw', bottom: '1vh', zIndex: '33333333' }} className='ctrl-panel hide'>
+      <Draggable>
+        <Card title="控制面板" size="small" style={{ width: '50vh', transform: 'translate(-50vw,0,0)' }}>
+          <X0 action={action} />
+          <div style={{ marginBottom: '1vh' }}>
+            <Radio.Group defaultValue={'translate'} buttonStyle="solid" onChange={(evt) => {
+              console.log(evt.target.value)
+              action.current.unshift({ act: evt.target.value.toUpperCase() })
+            }}>
+              <Radio.Button value="translate">平移</Radio.Button>
+              <Radio.Button value="rotate">旋转</Radio.Button>
+              <Radio.Button value="scale">缩放</Radio.Button>
+            </Radio.Group>
+          </div>
+          <CompactPicker onChange={(evt) => {
+            action.current.unshift({ act: 'CHANGE_COLOR', color: evt.hex })
+          }} />
+          <Divider />
+          <Button>保存</Button>
+          <Button>删除</Button>
+        </Card>
+      </Draggable>
+    </div>
+    {flagDetail && <FlagDetail action={action} />}
   </>
 }
+const X0 = ({ action }) => <Button onClick={() => {
+  action.current.unshift({ act: 'DETACH' })
+  document.querySelector('.ctrl-panel').classList.add('hide')
+}} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
 function Route({ link, linkTo, action }) {
   if (link === 'GEO_INFO') {
-    return null
+    return <Draggable>
+      <Card size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: 22222222 }}>
+        <X linkTo={linkTo} />
+        <StreamGraph />
+      </Card>
+    </Draggable >
   } else if (link === 'FIND_FLAG') {
     return <Card size='small' bodyStyle={{ padding: '6px' }} style={{ ...basicStyle, borderRadius: '8px' }}>
       <Input.Search placeholder="查找BIM标识点" onSearch={() => { }} enterButton />
@@ -67,6 +112,9 @@ function Route({ link, linkTo, action }) {
           </Tabs.TabPane>
           <Tabs.TabPane tab="桥" key="5">
             <CardGrid dataSource={bridgeMenu} action={action} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="事件" key="6">
+            <CardGrid dataSource={eventMenu} action={action} />
           </Tabs.TabPane>
         </Tabs>
       </Card>

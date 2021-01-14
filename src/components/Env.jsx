@@ -1,25 +1,55 @@
+import { softShadows } from '@react-three/drei'
 import React, { useRef } from 'react'
-import { useFrame } from 'react-three-fiber'
+softShadows()
 export default () => {
   const dlRef = useRef()
-  useFrame(({ camera }) => {
-    dlRef.current.position.set(
-      camera.position.x,
-      camera.position.y,
-      camera.position.z
-    )
-  })
+  const plRef = useRef()
   return (
     <>
-      <ambientLight />
+      <ambientLight intensity={0.5} color='#ffffff' />
       <directionalLight
-        ref={dlRef}
         castShadow
+        position={[-3000, -850, 0]}
+        intensity={0.7}
+        shadow-bias={-0.01}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
+        shadow-camera-far={20000}
+        shadow-camera-near={50}
+        shadow-camera-left={50}
+        shadow-camera-right={-50}
+        shadow-camera-top={50}
+        shadow-camera-bottom={-50}
       />
-      {/* <gridHelper args={[500000, 50]} />
-      <axesHelper args={[1000]} /> */}
+      <pointLight
+        castShadow
+        position={[-500, 70000, 0]}
+        intensity={1.0}
+        shadow-bias={-0.001}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-far={800000}
+        shadow-camera-near={50}
+        shadow-camera-left={50}
+        shadow-camera-right={-50}
+        shadow-camera-top={50}
+        shadow-camera-bottom={-50}
+      />
+      {/* <directionalLight
+        ref={dlRef}
+        castShadow
+        position={[10000, 500000, -10000]}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-left={10}
+        shadow-camera-right={-10}
+        shadow-camera-top={10}
+        shadow-camera-bottom={-10}
+      /> */}
+      {/* {plRef.current && <cameraHelper args={[plRef.current.shadow.camera]} />} */}
+
+      <gridHelper args={[500000, 50]} />
+      <axesHelper args={[1000]} />
     </>
   )
 }

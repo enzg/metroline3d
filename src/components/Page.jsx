@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { Row, Col, Card, Image, List, Form, Radio, Switch, Button } from 'antd'
 import { AppCtx, get, post } from '../Helper'
 import { AppConfig } from '../Config'
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { CheckOutlined, CloseOutlined, CloseCircleFilled } from '@ant-design/icons'
+import Draggable from 'react-draggable'
 export const CardGrid = ({ dataSource, action }) => {
   const cardStyle = { height: '50vh', overflowY: 'auto' }
   return (
@@ -19,7 +20,8 @@ export const CardGrid = ({ dataSource, action }) => {
                 height={128}
                 fallback={AppConfig.fallbackImage}
                 src={`${item.icon}.png`}
-                onClick={() => action.current.unshift({ act: 'MOD_SELECT', url: `${item.icon}.FBX`, detail: { name: `${item.name}`, color: '' } })}
+                onClick={() => action.current.unshift({ act: 'MOD_SELECT', url: `${item.icon}.FBX`, detail: { name: `${item.name}`, color: '' } })
+                }
               />
               <h5>{item.name}</h5>
             </div>
@@ -34,7 +36,7 @@ export const CardGrid = ({ dataSource, action }) => {
 
 export function MpsAndRisksList({ action }) {
   const [dataSource, setDataSource] = useState({ 'mpsList': [], 'riskList': [] })
-  useEffect(() => {
+  useMemo(() => {
     post({ url: AppConfig.url.postMpsAndRiskAndBimPoint, data: { 'guid': '06354514-6379-4556-b880-3df3cdb2f307' } })
       .then(data => {
         setDataSource(data.data)
@@ -45,8 +47,14 @@ export function MpsAndRisksList({ action }) {
       style={{ height: '60vh', width: '22vh' }}
       itemLayout="horizontal"
       dataSource={dataSource['mpsList']}
-      renderItem={item => (
-        <List.Item onClick={() => action.current.unshift({ act: 'FLAG_SELECT', url: 'models/basic/Box.FBX', detail: { name: `${item.name}`, color: `${item.type}` === '2' ? '#ff0000' : '#00ff00' } })} >
+      renderItem={(item, index) => (
+        <List.Item onClick={() => {
+          action.current.unshift({ act: 'FLAG_SELECT', url: 'models/basic/Box.FBX', detail: { name: `${item.name}`, color: `${item.type}` === '2' ? '#ff0000' : '#00ff00' } })
+          let updateDataSource = { ...dataSource }
+          updateDataSource['mpsList'].splice(index, 1)
+          setDataSource(updateDataSource)
+        }
+        } >
           <List.Item.Meta
             title={<span>{item.name}</span>}
             description={`BimId: ${item.bimId}  |  类型: ${item.type}`}
@@ -58,8 +66,14 @@ export function MpsAndRisksList({ action }) {
       style={{ height: '60vh', width: '22vh' }}
       itemLayout="horizontal"
       dataSource={dataSource['riskList']}
-      renderItem={item => (
-        <List.Item onClick={() => action.current.unshift({ act: 'FLAG_SELECT', url: `${item.bimId}` === '15' ? 'models/basic/Cone.FBX' : 'models/basic/Box.FBX', detail: { name: `${item.name}`, color: `${item.type}` === '2' ? '#ff0000' : '#00ff00' } })} >
+      renderItem={(item, index) => (
+        <List.Item onClick={() => {
+          action.current.unshift({ act: 'FLAG_SELECT', url: `${item.bimId}` === '15' ? 'models/basic/Cone.FBX' : 'models/basic/Box.FBX', detail: { name: `${item.name}`, color: `${item.type}` === '2' ? '#ff0000' : '#00ff00' } })
+          let updateDataSource = { ...dataSource }
+          updateDataSource['riskList'].splice(index, 1)
+          setDataSource(updateDataSource)
+        }
+        } >
           <List.Item.Meta
             title={<span>{item.name}</span>}
             description={`BimId: ${item.bimId}  |  类型: ${item.type}`}
@@ -102,7 +116,7 @@ export function ProjGrid() {
 }
 
 export function SceneSetting({ action }) {
-  const { weather, setWeather } = useContext(AppCtx)
+  const { weather, setWeather, tf, setTf } = useContext(AppCtx)
   return <Row gutter={[10, 10]}>
     <Col span={5}>
       <Card title='天气切换'>
@@ -122,7 +136,10 @@ export function SceneSetting({ action }) {
           <Switch
             checkedChildren={<CheckOutlined />}
             unCheckedChildren={<CloseOutlined />}
-            defaultChecked
+            defaultChecked={false}
+            onChange={(checked) => {
+              checked ? setTf(true) : setTf(false)
+            }}
           />
         </Form.Item>
       </Card>
@@ -134,6 +151,11 @@ export function SceneSetting({ action }) {
             checkedChildren={<CheckOutlined />}
             unCheckedChildren={<CloseOutlined />}
             defaultChecked
+            onChange={(checked) => {
+              document.querySelectorAll('.mod-name-flag').forEach(flag => {
+                checked ? flag.classList.remove('hide') : flag.classList.add('hide')
+              })
+            }}
           />
         </Form.Item>
         <Form.Item label="显示标识名称">
@@ -159,6 +181,9 @@ export function SceneSetting({ action }) {
               } else {
                 action.current.unshift({ act: 'HIDE_FLAG' })
               }
+              document.querySelectorAll('.flag').forEach(flag => {
+                checked ? flag.classList.remove('hide') : flag.classList.add('hide')
+              })
             }}
           />
         </Form.Item>
@@ -173,3 +198,24 @@ export function SceneSetting({ action }) {
     </Col>
   </Row>
 }
+
+export function FlagDetail({ action }) {
+  console.log('detail added')
+  return <div style={{ position: 'absolute', right: '1vw', top: '5.5vh', zIndex: '33333333' }} className='detail-panel'>
+    <Draggable>
+      <Card size='small' title='详情' bodyStyle={{ width: '70vh', height: '50vh' }}>
+        <X1 action={action} />
+      </Card>
+    </Draggable>
+  </div>
+}
+const closeButtonStyle = {
+  border: 'none',
+  position: 'absolute',
+  top: '2px',
+  right: '2px',
+  zIndex: 22222223
+}
+const X1 = ({ action }) => <Button onClick={() => {
+  document.querySelector('.detail-panel').classList.add('hide')
+}} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />

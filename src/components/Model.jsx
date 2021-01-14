@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { Html, useFBX } from '@react-three/drei'
-import { DoubleSide, MathUtils, Vector3 } from 'three'
+import { DoubleSide, MathUtils } from 'three'
 import { getFileExt, useMods } from '../Helper'
-import { Card } from 'antd'
-import { useFrame } from 'react-three-fiber'
 export default ({ path, position, mt, pt }) => {
   let mod = useFBX(path)
   mod.name = getFileExt(path)
@@ -25,6 +23,7 @@ export default ({ path, position, mt, pt }) => {
       }
     }
   })
+
   return <primitive object={mod} position={position || [0, 0, 0]} />
 }
 export const DynamicModel = ({ pathList, detail, ctrl, htmlCtrl, position, toggle, ft }) => {
@@ -43,7 +42,6 @@ export const DynamicModel = ({ pathList, detail, ctrl, htmlCtrl, position, toggl
           }
         }
       })
-
       if (ctrl) {
         return <InteractMod mod={mod} detail={detail} ctrl={ctrl} htmlCtrl={htmlCtrl} position={position || [0, 0, 0]} key={MathUtils.generateUUID()} />
       } else if (detail && position) {
@@ -59,35 +57,38 @@ function DetailMod({ mod, detail, position, ft, toggle: toggleDetail }) {
   const modGroup = useRef()
   const flagStyle = { padding: '2px 6px', textAlign: 'center', minWidth: '85px', backgroundColor: 'rgba(0,0,0,0.35)', color: `${detail.color}`, fontSize: '8px', fontWeight: 700 }
   useEffect(() => {
-    ft.current.push(modGroup)
+    // ft.current.push(modGroup)
+    ft.current[mod.name] = modGroup
   }, [])
   return (
-    <group
-      ref={modGroup}
-      position={position}
-      key={MathUtils.generateUUID()}
-      onClick={() => {
-        if (detail) {
-          toggleDetail(true);
-          // document.querySelectorAll('.flag').forEach(flag => flag.classList.toggle('hide'))
-        }
-      }}>
-      {mod.children.map((m) => {
-        m.scale.multiplyScalar(0.3)
-        if (m.type === 'Mesh') {
-          return <mesh {...m} position={[0, 0, 0]} key={m.uuid}>
-            <meshPhongMaterial color={detail.color} attach='material' />
-          </mesh>
-        }
-        return <primitive object={m} attachArray="children" key={m.uuid} />
+    <>
+      <group
+        castShadow
+        receiveShadow
+        ref={modGroup}
+        position={position}
+        key={MathUtils.generateUUID()}
+        onClick={() => {
+          if (detail) {
+            toggleDetail(true);
+          }
+        }}>
+        {mod.children.map((m) => {
+          if (m.type === 'Mesh' && detail.color !== '') {
+            return <mesh {...m} position={[0, 0, 0]} key={m.uuid}>
+              <meshPhongMaterial color={detail.color} attach='material' />
+            </mesh>
+          }
+          return <primitive object={m} attachArray="children" key={m.uuid} />
 
-      })}
-      <Html position className="flag" style={{ transform: 'translate(0,-50px)' }}>
-        <div style={flagStyle}>
-          {detail.name}
-        </div>
-      </Html>
-    </group>
+        })}
+        <Html className="flag" style={{ transform: 'translate(0,-50px)' }}>
+          <div style={flagStyle}>
+            {detail.name}
+          </div>
+        </Html>
+      </group>
+    </>
   )
 
 }
@@ -106,9 +107,7 @@ function InteractMod({ mod, ctrl, htmlCtrl, position, detail }) {
           ctrl.current.detach()
           ctrl.current.attach(modGroup.current)
         }
-        if (htmlCtrl && htmlCtrl.current) {
-          htmlCtrl.current.classList.remove('hide')
-        }
+        document.querySelector('.ctrl-panel').classList.remove('hide')
       }}>
       {mod.children.map((m) => (
         <primitive object={m} attachArray="children" key={m.uuid} />

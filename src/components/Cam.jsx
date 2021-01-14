@@ -1,13 +1,18 @@
-import { useEffect } from 'react'
-import { useThree } from 'react-three-fiber'
+import { useEffect, useRef } from 'react'
+import { useFrame, useThree } from 'react-three-fiber'
 import { Vector3 } from 'three'
 export default () => {
+  const initCam = useRef(true)
   const { camera, gl } = useThree()
   camera.fov = 45
   camera.aspect = window.innerWidth / window.innerHeight
-  camera.far = 4 * 200000
+  camera.far = 3 * 200000
   camera.near = 20
-  camera.position.lerp(new Vector3(0, 30, 1000), 0.3)
+  camera.updateProjectionMatrix()
+  camera.position.set(-26000, 500, 11000)
+  camera.lookAt(0, 100, 0)
+  useFrame(() => {
+  })
   useEffect(() => {
     const resize = () => {
       camera.aspect = window.innerWidth / window.innerHeight
