@@ -2,8 +2,6 @@ import { softShadows } from '@react-three/drei'
 import React, { useRef } from 'react'
 softShadows()
 export default () => {
-  const dlRef = useRef()
-  const plRef = useRef()
   return (
     <>
       <ambientLight intensity={0.5} color='#ffffff' />
@@ -35,21 +33,8 @@ export default () => {
         shadow-camera-top={50}
         shadow-camera-bottom={-50}
       />
-      {/* <directionalLight
-        ref={dlRef}
-        castShadow
-        position={[10000, 500000, -10000]}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-left={10}
-        shadow-camera-right={-10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
-      /> */}
-      {/* {plRef.current && <cameraHelper args={[plRef.current.shadow.camera]} />} */}
-
-      <gridHelper args={[500000, 50]} />
-      <axesHelper args={[1000]} />
+      {/* <gridHelper args={[500000, 50]} />
+      <axesHelper args={[1000]} /> */}
     </>
   )
 }
