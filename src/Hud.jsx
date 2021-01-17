@@ -56,7 +56,6 @@ export default ({ action }) => {
           <X0 action={action} />
           <div style={{ marginBottom: '1vh' }}>
             <Radio.Group defaultValue={'translate'} buttonStyle="solid" onChange={(evt) => {
-              console.log(evt.target.value)
               action.current.unshift({ act: evt.target.value.toUpperCase() })
             }}>
               <Radio.Button value="translate">平移</Radio.Button>
@@ -68,12 +67,17 @@ export default ({ action }) => {
             action.current.unshift({ act: 'CHANGE_COLOR', color: evt.hex })
           }} />
           <Divider />
-          <Button>保存</Button>
-          <Button>删除</Button>
+          <Button onClick={() => {
+            // just save the store in local storage.
+            action.current.unshift({ act: 'SAVE' })
+          }}>保存</Button>
+          <Button onClick={() => {
+            action.current.unshift({ act: 'DELETE' })
+          }}>删除</Button>
         </Card>
       </Draggable>
     </div>
-    {flagDetail && <FlagDetail action={action} />}
+    {flagDetail.show && <FlagDetail action={action} bimId={flagDetail.payload.bimId} type={flagDetail.payload.type} name={flagDetail.payload.name} />}
   </>
 }
 const X0 = ({ action }) => <Button onClick={() => {
@@ -82,8 +86,9 @@ const X0 = ({ action }) => <Button onClick={() => {
 }} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
 function Route({ link, linkTo, action }) {
   if (link === 'GEO_INFO') {
+    action.current.unshift({ act: 'GEO_SELECT' })
     return <Draggable>
-      <Card size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: 22222222 }}>
+      <Card className='geo-panel hide' size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: 22222222 }}>
         <X linkTo={linkTo} />
         <StreamGraph />
       </Card>

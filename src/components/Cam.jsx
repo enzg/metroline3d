@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from 'react-three-fiber'
 import { Vector3 } from 'three'
 export default () => {
-  const initCam = useRef(true)
   const { camera, gl } = useThree()
   camera.fov = 45
   camera.aspect = window.innerWidth / window.innerHeight

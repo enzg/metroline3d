@@ -8,7 +8,7 @@ export default () => {
       <directionalLight
         castShadow
         position={[-3000, -850, 0]}
-        intensity={0.7}
+        intensity={1.0}
         shadow-bias={-0.01}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -22,7 +22,7 @@ export default () => {
       <pointLight
         castShadow
         position={[-500, 70000, 0]}
-        intensity={1.0}
+        intensity={1.2}
         shadow-bias={-0.001}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -33,8 +33,8 @@ export default () => {
         shadow-camera-top={50}
         shadow-camera-bottom={-50}
       />
-      {/* <gridHelper args={[500000, 50]} />
-      <axesHelper args={[1000]} /> */}
+      {/* <gridHelper args={[500000, 50]} /> */}
+      <axesHelper args={[1000]} />
     </>
   )
 }

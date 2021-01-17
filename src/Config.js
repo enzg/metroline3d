@@ -28,7 +28,17 @@ export const AppConfig = {
       '/api/operation/getBuildingPoint?param.prjGuid=8a0ad2ec-3773-451d-889a-353688c73261',
     postMpsAndRiskAndBimPoint: '/api/operation/getMpsAndRiskAndBimPoint',
     getAllScenes: '/api/operation/getAllScene',
-    getAllProjs: '/api/operation/getPrj?param.parentId=0&param.type=0'
+    getAllProjs: '/api/operation/getPrj?param.parentId=0&param.type=0',
+    postDataByMpsId: '/api/operation/getDataByMpsId', // 线图
+    postMps: '/api/operation/getMps', // 测点详情
+    postRiskSource: '/api/operation/getRiskSource', // 危险源详情
+  },
+  buildingType: {
+    'basic': 0,
+    'vehicle': 1,
+    'plant': 2,
+    'building': 3,
+    'bridge': 4,
   },
   modLib: {
     树1: { name: 'shu1', icon: 'models/plant/shu1' },

@@ -26,3 +26,13 @@ canvas {
   color: #f2f2f2;
   font-size: 18px;
 }
+
+.selectBox {
+  border: 1px solid #55aaff;
+  background-color: rgba(75, 160, 255, 0.3);
+  position: fixed;
+}
+
+.front {
+  z-index: 3000;
+}
