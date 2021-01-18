@@ -3,9 +3,10 @@ import { MapControls, OrbitControls, TransformControls } from '@react-three/drei
 import { useFrame, useThree } from 'react-three-fiber'
 import { MathUtils, Vector3 } from 'three'
 import { SelectionBox } from 'three/examples/jsm/interactive/SelectionBox'
-import { SelectionHelper } from 'three/examples/jsm/interactive/SelectionHelper'
+// import { SelectionHelper } from 'three/examples/jsm/interactive/SelectionHelper'
 import { ModInstance } from './Model'
 import * as Store from '../Store'
+import { SelectionHelper } from '../SelectHelper'
 const player = {
   height: 100.0,
   speed: 4.0,
@@ -21,40 +22,43 @@ export default ({ mt, action, pt, toggle }) => {
   const flagTree = useRef({})
   const [modList, setModList] = useState([])
   const [loadedCount, setCount] = useState(0)
-  // let selectionBox = new SelectionBox(camera, scene)
-  // let selectHelper = new SelectionHelper(selectionBox, gl, 'selectBox')
+  let selectionBox = new SelectionBox(camera, scene)
+  let selectHelper = null //new SelectionHelper(selectionBox, gl, 'selectBox')
   // select box
-  // const pointDown = (evt) => {
-  //   if (evt.button === 0) {
-  //     document.querySelectorAll('.selectBox').forEach(box => {
-  //       box.classList.remove('hide')
-  //     })
-  //   } else {
-  //     document.querySelectorAll('.selectBox').forEach(box => {
-  //       box.classList.add('hide')
-  //     })
+  const pointDown = (evt) => {
+    if (evt.button === 0) {
+      document.querySelectorAll('.selectBox').forEach(box => {
+        box.classList.remove('hide')
+      })
+    }
+    // else {
+    //   document.querySelectorAll('.selectBox').forEach(box => {
+    //     box.classList.add('hide')
+    //   })
 
-  //   }
-  //   // selectionBox.startPoint.set(
-  //   //   (evt.clientX / window.innerWidth) * 2 - 1,
-  //   //   - (evt.clientY / window.innerHeight) * 2 + 1,
-  //   //   0.5)
-  // }
-  // const pointMove = (evt) => {
-  //   if (selectHelper.isDown) {
-  //     // selectionBox.endPoint.set(
-  //     //   (evt.clientX / window.innerWidth) * 2 - 1,
-  //     //   - (evt.clientY / window.innerHeight) * 2 + 1,
-  //     //   0.5)
-  //   }
-  // }
-  // const pointUp = (evt) => {
-  //   // selectionBox.endPoint.set(
-  //   //   (evt.clientX / window.innerWidth) * 2 - 1,
-  //   //   - (evt.clientY / window.innerHeight) * 2 + 1,
-  //   //   0.5)
-  //   document.querySelector('.geo-panel').classList.remove('hide')
-  // }
+    // }
+    selectionBox.startPoint.set(
+      (evt.clientX / window.innerWidth) * 2 - 1,
+      - (evt.clientY / window.innerHeight) * 2 + 1,
+      0.5)
+  }
+  const pointMove = (evt) => {
+    if (selectHelper && selectHelper.isDown) {
+      selectionBox.endPoint.set(
+        (evt.clientX / window.innerWidth) * 2 - 1,
+        - (evt.clientY / window.innerHeight) * 2 + 1,
+        0.5)
+    }
+  }
+  const pointUp = (evt) => {
+    selectionBox.endPoint.set(
+      (evt.clientX / window.innerWidth) * 2 - 1,
+      - (evt.clientY / window.innerHeight) * 2 + 1,
+      0.5)
+    document.querySelectorAll('.geo-panel').forEach(geo => {
+      geo.classList.remove('hide')
+    })
+  }
   useEffect(() => {
     const keyUp = (evt) => {
       keyboard.current[evt.keyCode] = false
@@ -63,9 +67,6 @@ export default ({ mt, action, pt, toggle }) => {
       keyboard.current[evt.keyCode] = true
     }
 
-    // window.addEventListener('pointerdown', pointDown)
-    // window.addEventListener('pointermove', pointMove)
-    // window.addEventListener('pointerup', pointUp)
     window.addEventListener('keydown', keyDown)
     window.addEventListener('keyup', keyUp)
 
@@ -76,10 +77,13 @@ export default ({ mt, action, pt, toggle }) => {
     })
     trans.current.mode = 'translate'
 
-
     return () => {
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
+
+      window.removeEventListener('pointerdown', pointDown)
+      window.removeEventListener('pointermove', pointMove)
+      window.removeEventListener('pointerup', pointUp)
     }
   }, [camera])
   useMemo(() => {
@@ -186,16 +190,23 @@ export default ({ mt, action, pt, toggle }) => {
       if (action.current[0].act === 'GEO_SELECT') {
         orb.current.target = new Vector3(-25000, 300, -12000)
         orb.current.enableRotate = false
+        selectHelper = new SelectionHelper(selectionBox, gl, 'selectBox')
+        selectHelper.isActive = true
+        window.addEventListener('pointerdown', pointDown)
+        window.addEventListener('pointermove', pointMove)
+        window.addEventListener('pointerup', pointUp)
         action.current.shift(0)
         return
       }
       if (action.current[0].act === 'GEO_UNSELECT') {
         orb.current.enableRotate = true
-        // selectionBox = null//new SelectionBox(camera, scene)
-        // selectHelper = null //new SelectionHelper(selectionBox, gl, 'selectBox')
-        // window.removeEventListener('pointerdown', pointDown)
-        // window.removeEventListener('pointermove', pointMove)
-        // window.removeEventListener('pointerup', pointUp)
+        window.removeEventListener('pointerdown', pointDown)
+        window.removeEventListener('pointermove', pointMove)
+        window.removeEventListener('pointerup', pointUp)
+        if (selectHelper) {
+          selectHelper.remove()
+          selectHelper.isActive = false
+        }
         action.current.shift(0)
         return
       }

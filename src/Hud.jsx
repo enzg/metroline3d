@@ -50,6 +50,10 @@ export default ({ action }) => {
       }
     </div>
     <Route link={link} linkTo={linkTo} action={action} />
+    <Card className='geo-panel hide' size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: '22222222' }}>
+      <X2 action={action} />
+      <StreamGraph />
+    </Card>
     <div style={{ position: 'absolute', right: '1vw', bottom: '1vh', zIndex: '33333333' }} className='ctrl-panel hide'>
       <Draggable>
         <Card title="控制面板" size="small" style={{ width: '50vh', transform: 'translate(-50vw,0,0)' }}>
@@ -84,15 +88,16 @@ const X0 = ({ action }) => <Button onClick={() => {
   action.current.unshift({ act: 'DETACH' })
   document.querySelector('.ctrl-panel').classList.add('hide')
 }} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
+
+
+const X2 = ({ action }) => <Button onClick={() => {
+  action.current.unshift({ act: 'GEO_UNSELECT' })
+  document.querySelector('.geo-panel').classList.add('hide')
+}} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
 function Route({ link, linkTo, action }) {
   if (link === 'GEO_INFO') {
     action.current.unshift({ act: 'GEO_SELECT' })
-    return <Draggable>
-      <Card className='geo-panel hide' size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: 22222222 }}>
-        <X linkTo={linkTo} />
-        <StreamGraph />
-      </Card>
-    </Draggable >
+    return null
   } else if (link === 'FIND_FLAG') {
     return <Card size='small' bodyStyle={{ padding: '6px' }} style={{ ...basicStyle, borderRadius: '8px' }}>
       <Input.Search placeholder="查找BIM标识点" onSearch={() => { }} enterButton />
