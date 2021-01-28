@@ -46,12 +46,13 @@ export const CardGrid = ({ dataSource, action }) => {
 
 export function MpsAndRisksList({ action }) {
   const [dataSource, setDataSource] = useState({ 'mpsList': [], 'riskList': [] })
+  let guid = localStorage.getItem('guid')
   useMemo(() => {
-    post({ url: AppConfig.url.postMpsAndRiskAndBimPoint, data: { 'guid': '06354514-6379-4556-b880-3df3cdb2f307' } })
+    post({ url: AppConfig.url.postUnpublishMpsAndRisk, data: { guid } })
       .then(data => {
         setDataSource(data.data)
       })
-  }, [])
+  }, [guid])
   return <div className="hide-scrollbar" style={{ overflowY: 'auto', height: '60vh', display: 'flex', justifyContent: 'space-between' }}>
     <List
       style={{ height: '60vh', width: '22vh' }}
@@ -68,7 +69,7 @@ export function MpsAndRisksList({ action }) {
             detail: {
               name: `${item.name}`,
               color: `${item.type}` === '2' ? '#ff0000' : '#00ff00',
-              bimId: item.bimId,
+              bimId: item.id,
               type: item.type
             }
           })
@@ -79,7 +80,7 @@ export function MpsAndRisksList({ action }) {
         } >
           <List.Item.Meta
             title={<span>{item.name}</span>}
-            description={`BimId: ${item.bimId}  |  类型: ${item.type}`}
+            description={`BimId: ${item.id}  |  类型: ${item.type}`}
           />
         </List.Item>
       )}
@@ -95,11 +96,11 @@ export function MpsAndRisksList({ action }) {
           }
           action.current.unshift({
             act: 'FLAG_SELECT',
-            url: `${item.bimId}` === '15' ? 'models/basic/Cone.FBX' : 'models/basic/Box.FBX',
+            url: `${item.id}` === '15' ? 'models/basic/Cone.FBX' : 'models/basic/Box.FBX',
             detail: {
               name: `${item.name}`,
               color: `${item.type}` === '2' ? '#ff0000' : '#00ff00',
-              bimId: item.bimId,
+              bimId: item.id,
               type: item.type
             }
           })
@@ -110,7 +111,7 @@ export function MpsAndRisksList({ action }) {
         } >
           <List.Item.Meta
             title={<span>{item.name}</span>}
-            description={`BimId: ${item.bimId}  |  类型: ${item.type}`}
+            description={`BimId: ${item.id}  |  类型: ${item.type}`}
           />
         </List.Item>
       )}
@@ -118,37 +119,44 @@ export function MpsAndRisksList({ action }) {
   </div>
 }
 
-export function ProjGrid() {
-  const [dataSource, setSource] = useState([])
+export const ProjGrid = React.memo(
+  ({ changeProj }) => {
+    const [dataSource, setSource] = useState([])
 
-  useEffect(() => {
-    // get buildings info frome server 
-    get({ url: AppConfig.url.getAllProjs })
-      .then(data => {
-        setSource(data.data)
-      }).catch(err => {
-        setSource([])
-      })
-  }, [])
-  return <Card size='small' style={{ height: '60vh', overflowY: 'auto' }} >
-    {
-      dataSource.map(item => {
-        return <Card.Grid key={Math.random()} style={{ width: '25%', textAlign: 'center' }}>
-          <div style={{ display: 'grid', placeItems: 'center' }}>
-            <Image
-              preview={false}
-              width={128}
-              height={128}
-              fallback={AppConfig.fallbackImage}
-              src={`${item.Url}.png`}
-              onClick={() => { }} />
-            <h5 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '15px' }}>{item.PrjName}</h5>
-          </div>
-        </Card.Grid>
-      })
-    }
-  </Card>
-}
+    useEffect(() => {
+      // get buildings info frome server 
+      get({ url: AppConfig.url.getAllScenes })
+        .then(data => {
+          setSource(data.data.scenes)
+        }).catch(err => {
+          setSource([])
+        })
+    }, [])
+    return <Card size='small' style={{ height: '60vh', overflowY: 'auto' }} >
+      {
+        dataSource.map(item => {
+          return <Card.Grid key={Math.random()} style={{ width: '25%', textAlign: 'center' }}>
+            <div style={{ display: 'grid', placeItems: 'center' }} onClick={() => {
+              changeProj(item.name)
+              localStorage.setItem('guid', item.guid || '0')
+              localStorage.setItem('projName', item.name || '0')
+              window.location.reload()
+            }}>
+              <Image
+                preview={false}
+                width={128}
+                height={128}
+                fallback={AppConfig.fallbackImage}
+                src={`${item.asset}.png`}
+                onClick={() => { }} />
+              <h5 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '15px' }}>{item.name}</h5>
+            </div>
+          </Card.Grid>
+        })
+      }
+    </Card>
+  }
+)
 
 export function SceneSetting({ action }) {
   const { weather, setWeather, tf, setTf } = useContext(AppCtx)

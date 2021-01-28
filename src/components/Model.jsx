@@ -9,7 +9,7 @@ export default ({ path, position, mt, pt }) => {
     if (m.type === 'Mesh') {
       m.castShadow = true
       m.receiveShadow = true
-      if (mt && ['DJ1.FBX', 'DJ2.FBX', 'DJ3.FBX', 'DJ6.FBX',].includes(mod.name)) {
+      if (mt && ['DJ1.FBX', 'DJ2.FBX', 'DJ3.FBX', 'DJ6.FBX', 'DX2.FBX', 'DM.FBX'].includes(mod.name)) {
         mt.current.push(m)
       }
       if (pt && ['DX2.FBX', 'DM.FBX'].includes(mod.name)) {
@@ -30,6 +30,7 @@ export const ModInstance = ({ pathList, detail, ctrl, position, toggle, ft, inde
   const { modList } = useMods({ pathList })
   if (modList.current.length) {
     return modList.current.map((mod) => {
+      console.log(mod.name)
       mod.traverse((m) => {
         if (m.type === 'Mesh') {
           m.castShadow = true
@@ -37,6 +38,8 @@ export const ModInstance = ({ pathList, detail, ctrl, position, toggle, ft, inde
           if (m.material.length) {
             m.material.forEach((mat) => {
               mat.side = DoubleSide
+              if (mod.name.indexOf('che') === -1)
+                mat.alphaTest = 0.5
               if (mat.map) mat.map.anisotropy = 8
             })
           }
@@ -69,7 +72,7 @@ function DetailMod({ mod, detail, position, ft, toggle: toggleDetail, indexKey, 
       userData={{ key: indexKey, detail, pathList }}
       onClick={() => {
         if (detail) {
-          toggleDetail({ show: true, payload: { bimId: detail.bimId, type: detail.type, name: detail.name } });
+          toggleDetail({ show: true, payload: { bimId: detail.bimId, type: detail.type, name: detail.name } })
         }
       }}>
       {mod.children.map((m) => {

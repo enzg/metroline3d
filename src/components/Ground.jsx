@@ -7,12 +7,13 @@ import { SelectionBox } from 'three/examples/jsm/interactive/SelectionBox'
 import { ModInstance } from './Model'
 import * as Store from '../Store'
 import { SelectionHelper } from '../SelectHelper'
+import { get, post } from '../Helper'
+import { AppConfig } from '../Config'
 const player = {
   height: 100.0,
   speed: 4.0,
   turnSpeed: Math.PI * 0.02
 }
-let oldMods = Store.all()
 export default ({ mt, action, pt, toggle }) => {
   const { camera, mouse, raycaster, scene, gl } = useThree()
   const rollOverRef = useRef()
@@ -21,7 +22,10 @@ export default ({ mt, action, pt, toggle }) => {
   const orb = useRef()
   const flagTree = useRef({})
   const [modList, setModList] = useState([])
-  const [loadedCount, setCount] = useState(0)
+  const [oldMods, setOldMods] = useState([])
+  const [oldFlags, setOldFlags] = useState([])
+  const modCount = useRef(0)
+  const flagCount = useRef(0)
   let selectionBox = new SelectionBox(camera, scene)
   let selectHelper = null //new SelectionHelper(selectionBox, gl, 'selectBox')
   // select box
@@ -31,12 +35,6 @@ export default ({ mt, action, pt, toggle }) => {
         box.classList.remove('hide')
       })
     }
-    // else {
-    //   document.querySelectorAll('.selectBox').forEach(box => {
-    //     box.classList.add('hide')
-    //   })
-
-    // }
     selectionBox.startPoint.set(
       (evt.clientX / window.innerWidth) * 2 - 1,
       - (evt.clientY / window.innerHeight) * 2 + 1,
@@ -86,10 +84,89 @@ export default ({ mt, action, pt, toggle }) => {
       window.removeEventListener('pointerup', pointUp)
     }
   }, [camera])
-  useMemo(() => {
-    let mod = oldMods[loadedCount]
+
+  useEffect(() => {
+    let guid = localStorage.getItem('guid')
+    get({ url: AppConfig.url.getBuildings + guid }).then(data => {
+      if (!data.data) {
+        return []
+      }
+      let ret = data.data.filter(item => item.buildingName.indexOf(':') !== -1).map(item => {
+        let [name, key, url] = item.buildingName.split(':')
+        let position = JSON.parse(item.buildingPosition || '[0,0,0]')
+        let scale = JSON.parse(item.buildingZoom)
+        let rotation = JSON.parse(item.buildingDirection)
+        let color = item.mainColor
+        return {
+          detail: { name, color },
+          key,
+          position,
+          scale,
+          rotation,
+          url
+        }
+      })
+      Store.clean().then(() => {
+        ret.forEach(item => {
+          Store.add(item)
+        })
+      })
+      setOldMods(ret)
+    })
+
+    post({ url: AppConfig.url.postMpsAndRiskAndBimPoint, data: { guid } }).then(data => {
+      if (!data.data) {
+        return
+      }
+      let { mpsList, riskList } = data.data
+      if (!mpsList) mpsList = []
+      if (!riskList) riskList = []
+      let ret = mpsList.concat(riskList).map(flag => {
+        let name = flag.name
+        let type = flag.type
+        let bimId = flag.bimId
+        let color = (`${flag.type}` === '2') ? '#ff0000' : '#00ff00'
+        return {
+          pos: [flag.x, flag.y, flag.z],
+          url: 'models/basic/Box.FBX',
+          key: MathUtils.generateUUID(),
+          detail: {
+            name,
+            color,
+            bimId,
+            type
+          }
+        }
+      })
+      setOldFlags(ret)
+    })
+
+  }, [])
+  useEffect(() => {
+    let flag = oldFlags[flagCount.current]
+    if (!flag) return
+    flagCount.current++
+    setModList(
+      modList.concat(
+        <ModInstance
+          position={flag.pos}
+          pathList={[flag.url]}
+          key={flag.key}
+          detail={flag.detail}
+          toggle={toggle}
+          ft={flagTree}
+          indexKey={flag.key}
+        />
+      )
+    )
+
+
+  }, [modList, oldFlags.length])
+  useEffect(() => {
+    let mod = oldMods[modCount.current]
     if (!mod) return
-    setCount(loadedCount + 1)
+
+    modCount.current++
     setModList(
       modList.concat(
         <ModInstance
@@ -104,7 +181,7 @@ export default ({ mt, action, pt, toggle }) => {
         />
       )
     )
-  }, [modList])
+  }, [modList, oldMods.length])
   useFrame(() => {
     raycastUpdate(rollOverRef, raycaster, mouse, camera, action, mt, pt)
     // playerMove(camera, keyboard)
@@ -219,6 +296,19 @@ export default ({ mt, action, pt, toggle }) => {
       <mesh ref={rollOverRef} position={[0, 3000000, 0]} onDoubleClick={() => {
         if (action.current[0] && action.current[0]['act'] === 'FLAG_SELECT' && !action.current[0]['lock']) {
           let pos = rollOverRef.current.position
+          pos.y += 50
+          let detail = action.current[0]['detail']
+          if (pos.y > 0) pos.y = 0
+          post({
+            url: AppConfig.url.saveMpsAndRisk, data: {
+              x: pos.x,
+              y: pos.y,
+              z: pos.z,
+              type: detail.type,
+              pointId: detail.bimId,
+              guid: localStorage.getItem('guid')
+            }
+          })
           action.current[0]['lock'] = true
           let indexKey = MathUtils.generateUUID()
           setModList(
@@ -265,12 +355,12 @@ export default ({ mt, action, pt, toggle }) => {
           return
         }
       }}>
-        <boxBufferGeometry attach="geometry" args={[50, 50, 50]} />
+        <boxBufferGeometry attach="geometry" args={[100, 100, 100]} />
         <meshPhongMaterial
           attach="material"
           color="lightgreen"
           transparent
-          opacity={0.5}
+          opacity={0.3}
         />
       </mesh>
       <OrbitControls
@@ -293,14 +383,14 @@ function raycastUpdate(rollOverRef, raycaster, mouse, camera, action, mt, pt) {
       let point = intersect.point
       rollOverRef.current.position.copy(point).add(intersect.face.normal)
       rollOverRef.current.position
-        .divideScalar(50)
+        .divideScalar(100)
         .floor()
-        .multiplyScalar(50)
-        .addScalar(25)
+        .multiplyScalar(100)
+        .addScalar(50)
       // 工程地段基准高度 -825. 在此之上的检测将物体放在上表面
       // 低于这个高度则可以嵌入.
       if (rollOverRef.current.position.y >= -825) {
-        rollOverRef.current.position.add(new Vector3(0, 25, 0))
+        rollOverRef.current.position.add(new Vector3(0, 0, 0))
       }
     }
   }
@@ -312,13 +402,13 @@ function raycastUpdate(rollOverRef, raycaster, mouse, camera, action, mt, pt) {
       let point = intersect.point
       rollOverRef.current.position.copy(point).add(intersect.face.normal)
       rollOverRef.current.position
-        .divideScalar(50)
+        .divideScalar(100)
         .floor()
-        .multiplyScalar(50)
-        .addScalar(25)
+        .multiplyScalar(100)
+        .addScalar(50)
       //对于地上部分, 需要放在地面上表面
       if (rollOverRef.current.position.y < 0) {
-        rollOverRef.current.position.add(new Vector3(0, 25, 0))
+        rollOverRef.current.position.add(new Vector3(0, 0, 0))
       }
     }
   }

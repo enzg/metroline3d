@@ -15,6 +15,7 @@ import Draggable from 'react-draggable'
 import StreamGraph from './components/StreamGraph'
 import { CompactPicker } from 'react-color'
 import { AppCtx } from './Helper'
+import { save } from './Store'
 const basicStyle = {
   width: '50vh',
   position: 'absolute',
@@ -32,6 +33,7 @@ const closeButtonStyle = {
 export default ({ action }) => {
   const [link, linkTo] = useState(null)
   const { flagDetail } = useContext(AppCtx)
+  const [projName, setProjName] = useState(localStorage.getItem('projName'))
   return <>
     <div className="top-nav">
       <div className="top-band">
@@ -41,7 +43,13 @@ export default ({ action }) => {
         </div>
       </div>
       <div>
-        <div><Button icon={<SaveFilled />}>保存</Button><Button icon={<MinusCircleFilled />}>退出</Button></div>
+        <div>
+          <Button type='text'>{projName === '0' ? '未选择工点' : projName}</Button>
+          <Button onClick={() => {
+            save(localStorage.getItem('guid')).then(data => {
+              console.log(data)
+            })
+          }} icon={<SaveFilled />}>保存</Button><Button icon={<MinusCircleFilled />}>退出</Button></div>
       </div>
     </div>
     <div className="top-hud">
@@ -49,7 +57,7 @@ export default ({ action }) => {
         Menus.map(menu => <Button icon={menu.icon} key={menu.key} onClick={() => linkTo(menu.key)}>{menu.name}</Button>)
       }
     </div>
-    <Route link={link} linkTo={linkTo} action={action} />
+    <Route link={link} linkTo={linkTo} action={action} changeProj={setProjName} />
     <Card className='geo-panel hide' size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: '22222222' }}>
       <X2 action={action} />
       <StreamGraph />
@@ -94,7 +102,10 @@ const X2 = ({ action }) => <Button onClick={() => {
   action.current.unshift({ act: 'GEO_UNSELECT' })
   document.querySelector('.geo-panel').classList.add('hide')
 }} ghost style={closeButtonStyle} icon={<CloseCircleFilled />} />
-function Route({ link, linkTo, action }) {
+
+
+function Route({ link, linkTo, action, changeProj }) {
+  console.log(changeProj)
   if (link === 'GEO_INFO') {
     action.current.unshift({ act: 'GEO_SELECT' })
     return null
@@ -144,7 +155,7 @@ function Route({ link, linkTo, action }) {
   } else if (link === 'PROJ_MANAGE') {
     return <Card size='small' title='工点管理' style={{ ...basicStyle, height: '70vh', width: '70vw', top: '15vh', left: '15vw' }} >
       <X linkTo={linkTo} />
-      <ProjGrid action={action} />
+      <ProjGrid action={action} changeProj={changeProj} />
     </Card>
 
   }
