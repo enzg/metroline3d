@@ -64,6 +64,7 @@ function DetailMod({ mod, detail, position, ft, toggle: toggleDetail, indexKey, 
   }, [])
   return (
     <group
+      name={detail.name}
       castShadow
       receiveShadow
       ref={modGroup}

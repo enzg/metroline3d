@@ -287,6 +287,16 @@ export default ({ mt, action, pt, toggle }) => {
         action.current.shift(0)
         return
       }
+      if (action.current[0].act === 'FIND') {
+        let searchKey = action.current[0].key
+        let flags = Object.values(flagTree.current)
+        let match = flags.find(f => f.current.name.toUpperCase().indexOf(searchKey.toUpperCase()) !== -1)
+        if (match) {
+          orb.current.target = match.current.position
+        }
+        action.current.shift(0)
+        return
+      }
     }
   })
   return (

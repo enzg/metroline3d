@@ -111,7 +111,9 @@ function Route({ link, linkTo, action, changeProj }) {
     return null
   } else if (link === 'FIND_FLAG') {
     return <Card size='small' bodyStyle={{ padding: '6px' }} style={{ ...basicStyle, borderRadius: '8px' }}>
-      <Input.Search placeholder="查找BIM标识点" onSearch={() => { }} enterButton />
+      <Input.Search placeholder="查找BIM标识点" onSearch={(evt) => {
+        action.current.unshift({ act: 'FIND', key: `${evt}` })
+      }} enterButton />
     </Card>
 
   } else if (link === 'MOD_LIB') {
