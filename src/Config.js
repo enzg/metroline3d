@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExperimentFilled, GoldFilled, HddFilled, EditFilled, SettingFilled, SignalFilled } from "@ant-design/icons"
+import { ExperimentFilled, GoldFilled, HddFilled, EditFilled, SettingFilled, SignalFilled, BoxPlotFilled } from "@ant-design/icons"
 
 export default {
   shadowMap: true,
@@ -14,7 +14,8 @@ export const Menus = [
   { name: '模型库', key: 'MOD_LIB', icon: <HddFilled /> },
   { name: '添加标识', key: 'ADD_FLAG', icon: <EditFilled /> },
   { name: '场景设置', key: 'SCENE_SETTING', icon: <SettingFilled /> },
-  { name: '工点管理', key: 'PROJ_MANAGE', icon: <SignalFilled /> }
+  { name: '工点管理', key: 'PROJ_MANAGE', icon: <SignalFilled /> },
+  { name: '盾构信息', key: 'SHOW_SHIELD', icon: <BoxPlotFilled /> },
 ]
 
 export const AppConfig = {

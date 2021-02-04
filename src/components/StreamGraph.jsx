@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import { DataSet } from '../Config'
+import dig from '../../dist/images/dg.gif'
+import { current } from 'immer'
 const textures = {
     // 粗砂
     'cusha': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAMAAADz0U65AAAABGdBTUEAALGPC/xhBQAAACBjSFJN AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAtFBMVEWvk3qrjneRd2SJcGCa gG2njXqiiXerj3ivknmvk3yhhXKKcGChhnOghXGhiHWskXmrjXOwlHytkXuWe2qnjHmrkH2rjnW1 mYG0l4CkiXWVemm3nIesj3uWe2iyl3+wk36kinaNc2G7n4q2m4aWfGmylX64nIS7noelinaNc2Kq j3y9oYuZfWqzl4C0l3+qjnmUeWefhHGpjnqcgW6tkHmuknmTeWaKcGGbgG2mjHmninP////9L0Lc AAAAAWJLR0Q7OQ70bAAAAAlwSFlzAAALEgAACxIB0t1+/AAAAAd0SU1FB+QMHwMfAEOX6TsAAABQ SURBVAjXY2BgZGJmYWVjZ+Dg5OLm4eXjZxAQFBIWEWUVYxCXkJSSlpGVY5CQV1BUUlZRZVBT19DU 0tbRZdDTN9A0NDI2YTBlNDO3sOSzAgCvcgcFOMx6CAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMC0x Mi0zMVQwMzozMTowMCswMDowMCtX8KEAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjAtMTItMzFUMDM6 MzE6MDArMDA6MDBaCkgdAAAAAElFTkSuQmCC',
@@ -63,13 +65,24 @@ function addImageLink(defs, keys) {
     })
 }
 
-function StreamGraph() {
+function StreamGraph({ shield }) {
     const nodeRef = useRef()
-
-
+    const digRef = useRef()
+    const [currentLeft, setCurrentLeft] = useState(0)
     useEffect(() => {
+        if (shield) {
+            nodeRef.current.addEventListener('scroll', evt => {
+                if (evt.target.scrollLeft <= 1000) {
+                    digRef.current.style.left = evt.target.scrollLeft + 'px'
+                    setCurrentLeft(parseFloat(digRef.current.style.left))
+                } else {
+                    digRef.current.style.left = (parseFloat(digRef.current.style.left) - (evt.target.scrollLeft - 1000)) + 'px'
+                }
+            })
+
+        }
         const margin = { top: 20, bottom: 20, left: 20, right: 20 }
-        const width = window.innerWidth * 4.0 - margin.left - margin.right
+        const width = window.innerWidth * 8.0 - margin.left - margin.right
         const height = window.innerHeight * 0.5 - margin.top - margin.bottom
         const dataSet = DataSet
 
@@ -89,7 +102,7 @@ function StreamGraph() {
             .call(d3.axisTop(xScale))
 
 
-        const defs = svg.append('svg:defs');
+        const defs = svg.append('svg:defs')
         addImageLink(defs, Object.keys(textures))
         // yAxies
         const yScale = d3.scaleLinear()
@@ -121,13 +134,23 @@ function StreamGraph() {
                 return colorScale(d.key)
             })
 
+        return () => {
 
+        }
 
     }, [])
 
 
 
-    return <div style={{ overflowX: 'auto', scrollBehavior: 'smooth', scrollbarColor: 'black' }} ref={nodeRef}></div>
+    return <div style={{ position: 'relative' }}>
+        {
+            shield && <div style={{ position: 'absolute', top: '0px', left: '20px' }}>盾构里程: {currentLeft} M</div>
+        }
+        <div style={{ position: 'absolute', top: '100px', left: '0', display: currentLeft > 40 ? 'block' : 'none' }} ref={digRef}>
+            <img src={'images/dig-bg.jpg'} style={{ height: '56px', width: '1000px', position: 'absolute', left: '-1000px' }} /><img src={dig} style={{ height: '56px' }} />
+        </div>
+        <div style={{ overflowX: 'auto', scrollBehavior: 'smooth', scrollbarColor: 'black' }} ref={nodeRef}></div>
+    </div>
 }
 
 export default StreamGraph

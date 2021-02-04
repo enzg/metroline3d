@@ -160,6 +160,12 @@ function Route({ link, linkTo, action, changeProj }) {
       <ProjGrid action={action} changeProj={changeProj} />
     </Card>
 
+  } else if (link === 'SHOW_SHIELD') {
+    console.log(link)
+    return <Card className='geo-panel' size='small' style={{ position: 'absolute', height: '51vh', width: 'calc(100vw - 80px)', bottom: '0.5vh', left: '4.2vw', zIndex: '22222222' }}>
+      <X2 action={action} />
+      <StreamGraph shield={true} />
+    </Card>
   }
   return null
 }
