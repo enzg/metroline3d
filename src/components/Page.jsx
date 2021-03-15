@@ -6,11 +6,12 @@ import { CheckOutlined, CloseOutlined, CloseCircleFilled } from '@ant-design/ico
 import { Line } from '@ant-design/charts'
 import Draggable from 'react-draggable'
 import FormItem from 'antd/lib/form/FormItem'
-
+import { ModDirConfig } from '../AssetsConfig'
 
 
 export const CardGrid = ({ dataSource, action }) => {
   const cardStyle = { height: '50vh', overflowY: 'auto' }
+  const assetPrefix =ModDirConfig[localStorage.getItem('projName')] 
   return (
     <Card size="small" style={cardStyle}>
       {dataSource.map((item) => {
@@ -24,7 +25,7 @@ export const CardGrid = ({ dataSource, action }) => {
                 width={128}
                 height={128}
                 fallback={AppConfig.fallbackImage}
-                src={`${item.icon}.png`}
+                src={`${assetPrefix}/${item.icon}.png`}
                 onClick={() => {
                   if (action.current && action.current[0] && action.current[0].act.indexOf('SELECT') !== -1) {
                     return

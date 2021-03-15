@@ -3,6 +3,7 @@ import { LoadingManager, Cache, Object3D } from 'three'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { AppConfig } from './Config'
 import axios from 'axios'
+import { ModDirConfig } from './AssetsConfig'
 Cache.enabled = true
 export const AppCtx = createContext({
   weather: 'sunny',
@@ -12,6 +13,7 @@ export function useMods({ pathList }) {
   const modList = useRef([])
   const loadingManager = useRef()
   const [count, setCount] = useState(0)
+  const assetPrefix = ModDirConfig[localStorage.getItem('projName')]
   useEffect(() => {
     if (count >= pathList.length) return
     // find in cache.
@@ -24,8 +26,9 @@ export function useMods({ pathList }) {
     } else {
       loadingManager.current = new LoadingManager()
       new Promise((ok, fail) => {
-        new FBXLoader(loadingManager.current).load(
-          pathList[count],
+        new FBXLoader(loadingManager.current)
+        .load(
+          `${assetPrefix}/${pathList[count]}`,
           (mod) => ok(mod),
           (evt) => { },
           (err) => fail(err)

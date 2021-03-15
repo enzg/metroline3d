@@ -9,6 +9,7 @@ import * as Store from '../Store'
 import { SelectionHelper } from '../SelectHelper'
 import { get, post } from '../Helper'
 import { AppConfig } from '../Config'
+import { ModDirConfig } from '../AssetsConfig'
 const player = {
   height: 100.0,
   speed: 4.0,
@@ -28,6 +29,7 @@ export default ({ mt, action, pt, toggle }) => {
   const flagCount = useRef(0)
   let selectionBox = new SelectionBox(camera, scene)
   let selectHelper = null //new SelectionHelper(selectionBox, gl, 'selectBox')
+  const assetPrefix = ModDirConfig[localStorage.getItem('projName')]
   // select box
   const pointDown = (evt) => {
     if (evt.button === 0) {
@@ -128,7 +130,7 @@ export default ({ mt, action, pt, toggle }) => {
         let color = (`${flag.type}` === '2') ? '#ff0000' : '#00ff00'
         return {
           pos: [flag.x, flag.y, flag.z],
-          url: 'models/basic/Box.FBX',
+          url: `models/basic/Box.FBX`,
           key: MathUtils.generateUUID(),
           detail: {
             name,
@@ -146,6 +148,7 @@ export default ({ mt, action, pt, toggle }) => {
     let flag = oldFlags[flagCount.current]
     if (!flag) return
     flagCount.current++
+    console.log('flag:',flag.url)
     setModList(
       modList.concat(
         <ModInstance
@@ -167,6 +170,7 @@ export default ({ mt, action, pt, toggle }) => {
     if (!mod) return
 
     modCount.current++
+    console.log(mod)
     setModList(
       modList.concat(
         <ModInstance
