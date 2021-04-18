@@ -11,7 +11,6 @@ import { ModDirConfig } from '../AssetsConfig'
 
 export const CardGrid = ({ dataSource, action }) => {
   const cardStyle = { height: '50vh', overflowY: 'auto' }
-  const assetPrefix =ModDirConfig[localStorage.getItem('projName')] 
   return (
     <Card size="small" style={cardStyle}>
       {dataSource.map((item) => {
@@ -25,7 +24,7 @@ export const CardGrid = ({ dataSource, action }) => {
                 width={128}
                 height={128}
                 fallback={AppConfig.fallbackImage}
-                src={`${assetPrefix}/${item.icon}.png`}
+                src={`${item.icon}.png`}
                 onClick={() => {
                   if (action.current && action.current[0] && action.current[0].act.indexOf('SELECT') !== -1) {
                     return
@@ -129,7 +128,7 @@ export const ProjGrid = React.memo(
       get({ url: AppConfig.url.getAllScenes })
         .then(data => {
           setSource(data.data.scenes)
-        }).catch(err => {
+        }).catch(() => {
           setSource([])
         })
     }, [])
@@ -160,7 +159,7 @@ export const ProjGrid = React.memo(
 )
 
 export function SceneSetting({ action }) {
-  const { weather, setWeather, tf, setTf } = useContext(AppCtx)
+  const { weather, setWeather, setTf } = useContext(AppCtx)
   return <Row gutter={[10, 10]}>
     <Col span={5}>
       <Card title='天气切换'>
@@ -247,7 +246,6 @@ export function FlagDetail({ action, bimId, type, name }) {
   const [mpsDetail, setMpsDetail] = useState({})
   const [lineData, setLineData] = useState([])
   const [riskDetail, setRiskDetail] = useState({})
-  const chartRef = useRef()
   useMemo(() => {
     if (`${type}` === '1') {
       post({ url: AppConfig.url.postMps, data: { id: bimId } }).then(data => {
@@ -347,7 +345,7 @@ const closeButtonStyle = {
   right: '2px',
   zIndex: 22222223
 }
-const X1 = ({ action }) => {
+const X1 = () => {
   const { toggle } = useContext(AppCtx)
   return <Button onClick={() => {
     toggle(false)

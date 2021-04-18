@@ -148,7 +148,6 @@ export default ({ mt, action, pt, toggle }) => {
     let flag = oldFlags[flagCount.current]
     if (!flag) return
     flagCount.current++
-    console.log('flag:',flag.url)
     setModList(
       modList.concat(
         <ModInstance
@@ -188,7 +187,6 @@ export default ({ mt, action, pt, toggle }) => {
   }, [modList, oldMods.length])
   useFrame(() => {
     raycastUpdate(rollOverRef, raycaster, mouse, camera, action, mt, pt)
-    // playerMove(camera, keyboard)
     if (action && action.current[0]) {
       if (action.current[0].act === 'HIDE_FLAG' && flagTree.current && Object.values(flagTree.current)) {
         Object.values(flagTree.current).forEach(flag => {

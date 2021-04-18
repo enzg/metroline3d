@@ -4,8 +4,6 @@ import { DoubleSide, Euler, MathUtils } from 'three'
 import { getFileExt, useMods } from '../Helper'
 import { ModDirConfig } from '../AssetsConfig'
 export default ({ path, position, mt, pt }) => {
-  const assetPrefix = ModDirConfig[localStorage.getItem('projName')] 
-  console.log(':::::::::::::::::::::::::::::',path)
   let mod = useFBX(path)
   mod.name = getFileExt(path)
   console.log('okkk')
@@ -31,7 +29,6 @@ export default ({ path, position, mt, pt }) => {
   return <primitive object={mod} position={position || [0, 0, 0]} />
 }
 export const ModInstance = ({ pathList, detail, ctrl, position, toggle, ft, indexKey, rotation, scale }) => {
-  console.log('modInstance:',pathList)
   const { modList } = useMods({ pathList })
   if (modList.current.length) {
     return modList.current.map((mod) => {

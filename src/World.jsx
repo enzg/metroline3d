@@ -16,20 +16,20 @@ export default React.memo(
     const { weather, tf, flagDetail, toggle } = useContext(AppCtx)
     const assetPrefix = ModDirConfig[localStorage.getItem('projName')]
     const resourceList = [
-      `${assetPrefix}/models/DX2.FBX`,
-      `${assetPrefix}/models/DM.FBX`,
-      `${assetPrefix}/models/DJ1.FBX`,
-      `${assetPrefix}/models/DJ2.FBX`,
-      `${assetPrefix}/models/DJ3.FBX`,
-      `${assetPrefix}/models/DJ6.FBX`,
+      `private_models/${assetPrefix}/DX2.FBX`,
+      `private_models/${assetPrefix}/DM.FBX`,
+      `private_models/${assetPrefix}/DJ1.FBX`,
+      `private_models/${assetPrefix}/DJ2.FBX`,
+      `private_models/${assetPrefix}/DJ3.FBX`,
+      `private_models/${assetPrefix}/DJ6.FBX`,
     ]
     return (
       <Canvas {...Config}>
         <Suspense fallback={<Loader />}>
           <Assets pathList={resourceList} mt={modelTree} pt={planeTree} />
-          {weather === 'sunny' && <Mod key={MathUtils.generateUUID()} path={`${assetPrefix}/models/SKY2.FBX`} />}
-          {weather === 'cloudy' && <Mod key={MathUtils.generateUUID()} path={`${assetPrefix}/models/SKY1.FBX`} />}
-          {tf && <Mod key={MathUtils.generateUUID()} path={`${assetPrefix}/models/event/tf.FBX`} />}
+          {weather === 'sunny' && <Mod key={MathUtils.generateUUID()} path={`private_models/${assetPrefix}/SKY2.FBX`} />}
+          {weather === 'cloudy' && <Mod key={MathUtils.generateUUID()} path={`private_models/${assetPrefix}/SKY1.FBX`} />}
+          {tf && <Mod key={MathUtils.generateUUID()} path={`models/event/tf.FBX`} />}
         </Suspense>
         <Ground mt={modelTree} action={action} pt={planeTree} toggle={toggle} />
         <Env />

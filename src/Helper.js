@@ -13,7 +13,6 @@ export function useMods({ pathList }) {
   const modList = useRef([])
   const loadingManager = useRef()
   const [count, setCount] = useState(0)
-  const assetPrefix = ModDirConfig[localStorage.getItem('projName')]
   useEffect(() => {
     if (count >= pathList.length) return
     // find in cache.
@@ -28,7 +27,7 @@ export function useMods({ pathList }) {
       new Promise((ok, fail) => {
         new FBXLoader(loadingManager.current)
         .load(
-          `${assetPrefix}/${pathList[count]}`,
+          `${pathList[count]}`,
           (mod) => ok(mod),
           (evt) => { },
           (err) => fail(err)

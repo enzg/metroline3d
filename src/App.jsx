@@ -29,7 +29,6 @@ export default () => {
   if(!modKey){
     localStorage.setItem('modKey',ModDirConfig[projName])
     modKey = ModDirConfig[projName]
-    console.log('ok')
   }
   return <div className="app-root">
     <AppCtx.Provider value={{ weather, setWeather, tf, setTf, flagDetail, toggle }}>
