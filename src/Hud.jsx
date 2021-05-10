@@ -5,6 +5,7 @@ import {
     CloseCircleFilled,
     CloseOutlined,
     GoldenFilled,
+    CopyOutlined,
     SaveFilled,
     MinusCircleFilled,
 } from "@ant-design/icons";
@@ -29,6 +30,7 @@ import StreamGraph from "./components/StreamGraph";
 import { CompactPicker } from "react-color";
 import { AppCtx } from "./Helper";
 import { save } from "./Store";
+import copy from 'copy-to-clipboard'
 const basicStyle = {
     width: "18vw",
     position: "absolute",
@@ -58,6 +60,11 @@ export default ({ action, view }) => {
                 <span>中铁西南科学研究院有限公司三维地质模型</span>
                 <div className="action">
                     <div>
+                        {!view &&
+                        <Button onClick={()=>{
+                            copy(`${location.host}?projName=${localStorage.getItem('projName')}&guid=${localStorage.getItem('guid')}`)
+                            }} icon={<CopyOutlined />}>复制分享链接</Button>
+                        }
                         <Button type="text">
                             {projName === "0" ? "未选择工点" : projName}
                         </Button>
