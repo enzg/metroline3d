@@ -15,8 +15,14 @@
 .hide-scrollbar {
   overflow: -moz-scrollbars-none;
 }
+.hide-scrollbar {
+  background-color: rgba(76, 160, 170, 0.65);
+}
 .ant-card {
-  background-color: rgba(76, 160, 170, 0.85);
+  background-color: rgba(76, 160, 170, 0.65);
+}
+.ant-card-small > .ant-card-body {
+  padding: 4px;
 }
 .ant-btn {
   background-color: rgba(0, 0, 0, 0.85);
@@ -32,6 +38,51 @@
   border: rgba(220, 220, 220, 0.85) 1px solid;
 }
 
+.ant-tabs-nav {
+  background-color: #2ac9cf;
+  color: #fff;
+}
+.ant-card-grid h5 {
+  color: #fff;
+  font-size: 10px;
+}
+#root .ant-list-item-meta-content,
+#root .ant-list-item-meta-title,
+#root .ant-list-item-meta-description {
+  color: #fff;
+}
+#root .ant-tabs-nav-operations {
+  display: none !important;
+}
+#root .ant-tabs-tab {
+  padding: 1px 16px;
+}
+#root .ant-list-split .ant-list-item {
+  border-bottom: none;
+}
+.ant-form-item-label > label {
+  color: #fff;
+}
+.ant-card-grid {
+  box-shadow: none;
+}
+.card-title-wrap {
+  display: flex;
+  color: #fff;
+  font-size: 10px;
+  background-color: rgba(76, 160, 170, 0.65);
+  padding-left: 1vw;
+  margin-bottom: 2px;
+  align-items: center;
+}
+.card-position-wrap {
+  border-top: 2px solid #2bd9da;
+  padding-top: 2px;
+}
+.card-body-border {
+  padding: 3px;
+  border: 2px solid #2bd9da;
+}
 .top-nav {
   position: absolute;
   z-index: 1000;
@@ -69,8 +120,10 @@
 }
 
 .top-hud button.ant-btn {
+  /*
   height: 34px;
   width: 30vh;
+  */
   background-color: rgba(76, 160, 170, 0.85);
   color: #fff;
   text-align: left;
@@ -109,4 +162,3 @@
 #root .hide {
   display: none !important;
 }
-
