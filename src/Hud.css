@@ -46,9 +46,14 @@
   color: #fff;
   font-size: 10px;
 }
+#root .ant-card-body canvas {
+  background-color: #2ac9cf;
+}
 #root .ant-list-item-meta-content,
 #root .ant-list-item-meta-title,
-#root .ant-list-item-meta-description {
+#root .ant-list-item-meta-description,
+#root .ant-form-item-control-input-content,
+#root .ant-card-head-title {
   color: #fff;
 }
 #root .ant-tabs-nav-operations {
@@ -85,7 +90,7 @@
 }
 .top-nav {
   position: absolute;
-  z-index: 1000;
+  z-index: 999999;
   display: flex;
   width: 100%;
   height: 4.7vh;

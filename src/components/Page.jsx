@@ -2,7 +2,7 @@ import React, { useContext, useRef, useEffect, useMemo, useState } from "react";
 import { Row, Col, Card, Image, List, Form, Radio, Switch, Button } from "antd";
 import { AppCtx, get, post } from "../Helper";
 import { AppConfig } from "../Config";
-import { CheckOutlined, CloseOutlined, CloseCircleFilled } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseOutlined, CloseCircleFilled } from "@ant-design/icons";
 import { Line } from "@ant-design/charts";
 import Draggable from "react-draggable";
 import FormItem from "antd/lib/form/FormItem";
@@ -239,7 +239,7 @@ export function SceneSetting({ action }) {
                         </Form.Item>
                     </Radio.Group>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                     <Button size="small" style={{ marginTop: "10px" }}>
                         重置标识
                     </Button>
@@ -247,62 +247,98 @@ export function SceneSetting({ action }) {
                         镜头复位
                     </Button>
                 </Col>
-                <Col span={8}>
-                    <Switch
-                        size="small"
-                        checkedChildren="模型名称开"
-                        unCheckedChildren="模型名称关"
-                        defaultChecked
-                        onChange={(checked) => {
-                            document
-                                .querySelectorAll(".mod-name-flag")
-                                .forEach((flag) => {
+                <Col span={10}>
+                    <div
+                        style={{
+                            color: "#fff",
+                            display: "flex",
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
+                        }}
+                    >
+                        <span>模型名称</span>
+                        <Switch
+                            size="small"
+                            checkedChildren={<CheckCircleOutlined />}
+                            defaultChecked
+                            onChange={(checked) => {
+                                document
+                                    .querySelectorAll(".mod-name-flag")
+                                    .forEach((flag) => {
+                                        checked
+                                            ? flag.classList.remove("hide")
+                                            : flag.classList.add("hide");
+                                    });
+                            }}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            color: "#fff",
+                            display: "flex",
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
+                        }}
+                    >
+                        <span>标识名称</span>
+                        <Switch
+                            size="small"
+                            checkedChildren={<CheckCircleOutlined />}
+                            defaultChecked
+                            onChange={(checked) => {
+                                document.querySelectorAll(".flag").forEach((flag) => {
                                     checked
                                         ? flag.classList.remove("hide")
                                         : flag.classList.add("hide");
                                 });
+                            }}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            color: "#fff",
+                            display: "flex",
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
                         }}
-                    />
-                    <Switch
-                        size="small"
-                        checkedChildren="标识名称开"
-                        unCheckedChildren="标识名称关"
-                        defaultChecked
-                        onChange={(checked) => {
-                            document.querySelectorAll(".flag").forEach((flag) => {
-                                checked
-                                    ? flag.classList.remove("hide")
-                                    : flag.classList.add("hide");
-                            });
+                    >
+                        <span>显示标识</span>
+                        <Switch
+                            size="small"
+                            checkedChildren={<CheckCircleOutlined />}
+                            defaultChecked
+                            onChange={(checked) => {
+                                if (checked) {
+                                    action.current.unshift({ act: "SHOW_FLAG" });
+                                } else {
+                                    action.current.unshift({ act: "HIDE_FLAG" });
+                                }
+                                document.querySelectorAll(".flag").forEach((flag) => {
+                                    checked
+                                        ? flag.classList.remove("hide")
+                                        : flag.classList.add("hide");
+                                });
+                            }}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            color: "#fff",
+                            display: "flex",
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
                         }}
-                    />
-                    <Switch
-                        size="small"
-                        checkedChildren="显示标识"
-                        unCheckedChildren="隐藏标识"
-                        defaultChecked
-                        onChange={(checked) => {
-                            if (checked) {
-                                action.current.unshift({ act: "SHOW_FLAG" });
-                            } else {
-                                action.current.unshift({ act: "HIDE_FLAG" });
-                            }
-                            document.querySelectorAll(".flag").forEach((flag) => {
-                                checked
-                                    ? flag.classList.remove("hide")
-                                    : flag.classList.add("hide");
-                            });
-                        }}
-                    />
-                    <Switch
-                        size="small"
-                        checkedChildren="显示塌方"
-                        unCheckedChildren="隐藏塌方"
-                        defaultChecked={false}
-                        onChange={(checked) => {
-                            checked ? setTf(true) : setTf(false);
-                        }}
-                    />
+                    >
+                        <span>显示塌方</span>
+                        <Switch
+                            size="small"
+                            checkedChildren={<CheckCircleOutlined />}
+                            defaultChecked={false}
+                            onChange={(checked) => {
+                                checked ? setTf(true) : setTf(false);
+                            }}
+                        />
+                    </div>
                 </Col>
             </Row>
             <Row gutter={[10, 10]}>
@@ -380,7 +416,7 @@ export function FlagDetail({ action, bimId, type, name }) {
                             <div style={{ flex: 1.3 }}>
                                 <Line
                                     data={lineData}
-                                    height={"47vh"}
+                                    height={473}
                                     xField="measTime"
                                     xAxis={{ type: "timeCat", tickCount: 5 }}
                                     smooth
