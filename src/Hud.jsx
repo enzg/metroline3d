@@ -177,6 +177,7 @@ export default ({ action, view }) => {
                         style={{ ...basicStyle, top: "83vh" }}
                     >
                         <div className="card-title-wrap" onClick={() =>{
+                            showShield(false)
                             action.current.unshift({ act: "GEO_SELECT" })
                             document.querySelector(".top-hud").classList.add("hide")
                         }}>地质显示</div>
