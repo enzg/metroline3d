@@ -74,7 +74,7 @@ function addImageLink(defs, keys) {
     });
 }
 
-function StreamGraph({ shield }) {
+function StreamGraph({ shield, action }) {
     const nodeRef = useRef();
     const digRef = useRef();
     const [currentLeft, setCurrentLeft] = useState(0);
@@ -146,19 +146,25 @@ function StreamGraph({ shield }) {
     }, []);
     useEffect(() => {
         const scroll = (evt) => {
-            if (evt.target.scrollLeft <= 1000) {
-                digRef.current.style.left = evt.target.scrollLeft + "px";
-                setCurrentLeft(parseFloat(digRef.current.style.left));
-            } else {
-                digRef.current.style.left =
-                    parseFloat(digRef.current.style.left) -
-                    (evt.target.scrollLeft - 1000) +
-                    "px";
+            if (shield) {
+                if (evt.target.scrollLeft <= 1000) {
+                    digRef.current.style.left = evt.target.scrollLeft + "px";
+                    setCurrentLeft(parseFloat(digRef.current.style.left));
+                } else {
+                    digRef.current.style.left =
+                        parseFloat(digRef.current.style.left) -
+                        (evt.target.scrollLeft - 1000) +
+                        "px";
+                }
+                if (action.current) {
+                    action.current.unshift({
+                        act: "MOVE-CAM",
+                        delta: `${nodeRef.current.scrollLeft}`,
+                    });
+                }
             }
         };
-        if (shield) {
-            nodeRef.current.addEventListener("scroll", scroll);
-        }
+        nodeRef.current.addEventListener("scroll", scroll);
         return () => {
             if (shield) {
                 nodeRef.current.removeEventListener("scroll", scroll);
@@ -167,7 +173,7 @@ function StreamGraph({ shield }) {
     }, [shield]);
 
     return (
-        <div style={{ position: "relative",display:'flex',alignItems:"center" }}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             {shield && (
                 <div
                     style={{
@@ -199,52 +205,159 @@ function StreamGraph({ shield }) {
                     }}
                 />
                 <img src={dig} style={{ height: "56px" }} />
+                <div
+                    style={{
+                        position:'absolute',
+                        top:'-135px',
+                        left:'300px'
+                    }}
+                >
+                    <img src={
+                        'images/gm.png'
+                    } />
+                </div>
+                <div
+                    style={{
+                        position:'absolute',
+                        top:'-135px',
+                        left:'3500px'
+                    }}
+                >
+                    <img src={
+                        'images/gm.png'
+                    } />
+                </div>
+                <div
+                    style={{
+                        position:'absolute',
+                        top:'-135px',
+                        left:'5500px'
+                    }}
+                >
+                    <img src={
+                        'images/gm.png'
+                    } />
+                </div>
             </div>
-            <div style={{
-                height:`${window.innerHeight * 0.5 - 60}px`,
-                marginTop:'10px',
-                width:'600px',
-                backgroundColor:'#2ac9cf',
-                    display:"flex",
-                    flexDirection:'column',
-                alignItems:'center',
-                fontSize:'10px'
-            }} >
-                <div style={{
-                    marginTop:'5px',
-                    width:'32px',
-                    height: '64px',
-                    color:'#fff'
-                }}>
-                    <img src={textures['cushaX64']} width={32} height={32} />
+            <div
+                style={{
+                    height: `${window.innerHeight * 0.5 - 60}px`,
+                    overflowY: "auto",
+                    marginTop: "10px",
+                    width: "40%",
+                    backgroundColor: "#2ac9cf",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    fontSize: "10px",
+                    gap:'5px',
+                    zIndex:10
+                }}
+            >
+                <div
+                    style={{
+                        marginTop: "5px",
+                        width: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["cushaX64"]} width={24} height={24} />
                     <span>粗砂</span>
                 </div>
-                <div style={{
-                    marginTop:'5px',
-                    width:'32px',
-                    height: '64px',
-                    color:'#fff'
-                }}>
-                    <img src={textures['fzntX64']} width={32} height={32} />
+                <div
+                    style={{
+                        width: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["fzntX64"]} width={24} height={24} />
                     <span>粉质黏土</span>
                 </div>
-                <div style={{
-                    marginTop:'5px',
-                    width:'32px',
-                    height: '64px',
-                    color:'#fff'
-                }}>
-                    <img src={textures['fxsha']} width={32} height={32} />
+                <div
+                    style={{
+                        width: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["fxsha"]} width={24} height={24} />
                     <span>粉细砂</span>
                 </div>
-                <div style={{
-                    marginTop:'5px',
-                    width:'32px',
-                    height: '64px',
-                    color:'#fff'
-                }}>
-                    <img src={textures['lznxtX64']} width={32} height={32} />
+                <div
+                    style={{
+                        width: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["lznxtX64"]} width={24} height={24} />
                     <span>砾质黏性土</span>
+                </div>
+                <div
+                    style={{
+                        width: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["quanfhhgyX64"]} width={24} height={24} />
+                    <span>全风化</span>
+                    <span>花岗岩</span>
+                </div>
+                <div
+                    style={{
+                        width: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["tzqfhhgyX64"]} width={24} height={24} />
+                    <span>土状强风化</span>
+                    <span>花岗岩</span>
+                </div>
+                <div
+                    style={{
+                        marginTop: "5px",
+                        width: "64px",
+                        height: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["kzqfhhgyX64"]} width={24} height={24} />
+                    <span>块状强风化</span>
+                    <span>花岗岩</span>
+                </div>
+                <div
+                    style={{
+                        marginTop: "5px",
+                        width: "64px",
+                        height: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        color: "#fff",
+                    }}
+                >
+                    <img src={textures["zdfhhgyX64"]} width={24} height={24} />
+                    <span>中等风化</span>
+                    <span>花岗岩</span>
                 </div>
             </div>
             <div

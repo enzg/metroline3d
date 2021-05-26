@@ -34,7 +34,7 @@ export default () => {
         shadow-camera-bottom={-50}
       />
       {/* <gridHelper args={[500000, 50]} /> */}
-      {/* <axesHelper args={[1000]} /> */}
+        {/* <axesHelper args={[100000]} /> */}
     </>
   )
 }

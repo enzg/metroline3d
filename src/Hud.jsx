@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState,useEffect } from "react";
 import { Button, Card, Col, Form, Input, Radio, Row, Switch, Tabs, Divider } from "antd";
 import {
     CheckOutlined,
@@ -49,6 +49,18 @@ export default ({ action, view }) => {
     const [shield, showShield] = useState(false);
     const { flagDetail } = useContext(AppCtx);
     const [projName, setProjName] = useState(localStorage.getItem("projName"));
+    useEffect(() => {
+        const keyup = (e)=>{
+            // q key
+            if(e.keyCode === 81){
+                document.querySelector(".top-hud").classList.toggle('hide')
+            }
+        }
+        window.addEventListener('keyup', keyup)
+        return ()=>{
+            window.removeEventListener('keyup', keyup)
+        }
+    },[])
     return (
         <>
             <div
@@ -168,6 +180,7 @@ export default ({ action, view }) => {
                     >
                         <div className="card-title-wrap" onClick={()=>{
                             showShield(true)
+                            action.current.unshift({ act: "SHIELD" })
                             document.querySelector(".top-hud").classList.add("hide")
                             document.querySelector(".geo-panel").classList.remove('hide')
                         }}>盾构信息</div>
@@ -205,14 +218,14 @@ export default ({ action, view }) => {
                 style={{
                     position: "absolute",
                     height: "51vh",
-                    width: "calc(100vw - 80px)",
+                    width: "calc(100vw)",
                     bottom: "0.5vh",
-                    left: "2vw",
+                    left: "0",
                     zIndex: "22222222",
                 }}
             >
                 <X2 action={action} />
-                <StreamGraph shield={shield} />
+                <StreamGraph shield={shield} action={action} />
             </Card>
             <div
                 style={{

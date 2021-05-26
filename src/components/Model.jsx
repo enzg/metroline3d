@@ -29,8 +29,15 @@ async function loadFBX(path) {
     });
 }
 
+function Loading() {
+    return (
+        <Html zIndexRange={[999999, 999999]} className="loading" center>
+            <div className="center-box">资源加载中,请稍后...</div>
+        </Html>
+    );
+}
 export default React.memo(({ path, position, mt, pt }) => {
-    const [mod, setMod] = useState(null);
+    const [mod, setMod] = useState(<Loading />);
     useEffect(() => {
         const loadMod = async (path) => {
             let group = await loadFBX(path);
@@ -165,10 +172,16 @@ function DetailMod({
         fontWeight: 700,
     };
     useEffect(() => {
+        /*
         if (ft && ft.current) {
             ft.current[mod.name] = modGroup;
+            console.log(ft.current)
         }
+        */
     }, []);
+    if(ft && ft.current){
+        ft.current[detail.name]={key:detail.name,position: position}
+    }
     return (
         <group
             name={detail.name}
@@ -202,7 +215,23 @@ function DetailMod({
                 return <primitive object={m} attachArray="children" key={m.uuid} />;
             })}
             <Html className="flag" style={{ transform: "translate(0,-50px)" }}>
-                <div style={flagStyle}>{detail.name}</div>
+                <div
+                    onClick={() => {
+                        if (detail) {
+                            toggleDetail({
+                                show: true,
+                                payload: {
+                                    bimId: detail.bimId,
+                                    type: detail.type,
+                                    name: detail.name,
+                                },
+                            });
+                        }
+                    }}
+                    style={flagStyle}
+                >
+                    {detail.name}
+                </div>
             </Html>
         </group>
     );

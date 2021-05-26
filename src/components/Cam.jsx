@@ -1,6 +1,5 @@
-import { useEffect, useRef } from "react";
-import { useFrame, useThree } from "react-three-fiber";
-import { Vector3 } from "three";
+import {useEffect} from "react";
+import {useThree} from "react-three-fiber";
 export default () => {
     const { camera, gl } = useThree();
     useEffect(() => {

@@ -22,9 +22,12 @@ canvas {
 }
 
 .loading {
-  width: 50vw;
+  width: 40vw;
   color: #f2f2f2;
-  font-size: 18px;
+  background-color: rgba(76, 160, 170, 0.65);
+  border-radius: 10px;
+  padding: 30px;
+  font-size: 24px;
 }
 
 .selectBox {
@@ -36,3 +39,4 @@ canvas {
 .front {
   z-index: 3000;
 }
+

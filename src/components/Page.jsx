@@ -368,6 +368,7 @@ export function FlagDetail({ action, bimId, type, name }) {
                     access_token: localStorage.getItem("token"),
                 },
             }).then((data) => {
+                console.log(data)
                 setLineData(data.data);
             });
         } else if (`${type}` === "2") {
@@ -416,11 +417,11 @@ export function FlagDetail({ action, bimId, type, name }) {
                             <div style={{ flex: 1.3 }}>
                                 <Line
                                     data={lineData}
-                                    height={473}
+                                    height={window.innerHeight * 0.46}
                                     xField="measTime"
                                     xAxis={{ type: "timeCat", tickCount: 5 }}
                                     smooth
-                                    yField="value"
+                                    yField="accValue"
                                     padding="auto"
                                 />
                             </div>
