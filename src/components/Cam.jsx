@@ -7,7 +7,7 @@ export default () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.far = 3 * 200000;
         camera.near = 20;
-        camera.position.set(-26000, 500, 11000);
+        camera.position.set(-16000, 500, 11000);
         camera.lookAt(0, 100, 0);
         camera.updateProjectionMatrix();
         const resize = () => {

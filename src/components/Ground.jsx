@@ -295,7 +295,6 @@ export default ({ mt, action, pt, toggle, view }) => {
                 return;
             }
             if (action.current[0].act === "GEO_SELECT") {
-                orb.current.target.set(new Vector3(-25000, 300, -12000));
                 orb.current.enableRotate = false;
                 selectHelper = new SelectionHelper(selectionBox, gl, "selectBox");
                 selectHelper.isActive = true;
@@ -341,23 +340,29 @@ export default ({ mt, action, pt, toggle, view }) => {
                 return;
             }
             if (action.current[0].act === "SHIELD") {
-                camera.position.set(-26000, 500, 11000);
-
-                //camera.lookAt(-26000,500,0)
+                camera.position.set(-60000, 500, 11000);
                 camera.updateProjectionMatrix();
-                orb.current.update();
+                orb.current.target = new Vector3(-60000,500,-11000)
                 action.current.shift(0);
                 orb.current.enabled = true;
                 return;
             }
             if (action.current[0].act === "MOVE-CAM") {
                 let delta = action.current[0].delta;
-                camera.translateX(delta);
-                camera.updateProjectionMatrix();
+                let dest = new Vector3(-60000 + 120000,500,11000)
+                if(delta > lastScrollLeft.current){
+                    dest = new Vector3(-60000 + 120000,500,11000)
+                }else{
+                    dest = new Vector3(-60000,500,11000)
+                }
                 lastScrollLeft.current = delta;
                 action.current.shift(0);
+
+                orb.current.enabled = false
+                camera.position.lerp(dest,0.01)
+                camera.updateProjectionMatrix();
+                orb.current.target = new Vector3(camera.position.x,orb.current.target.y,orb.current.target.z)
                 orb.current.enabled = true;
-                orb.current.update();
                 return;
             }
         }
@@ -451,7 +456,7 @@ export default ({ mt, action, pt, toggle, view }) => {
                 />
             </mesh>
             <OrbitControls
-                target={[-25000, 300, -12000]}
+                target={[-16000, 500, -11000]}
                 ref={orb}
                 enableDamping
                 minPolarAngle={0}
