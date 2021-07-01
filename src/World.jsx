@@ -1,27 +1,29 @@
-import { Html, softShadows } from "@react-three/drei";
-import React, { Suspense, useContext, useEffect, useRef, useState } from "react";
-import { Canvas } from "react-three-fiber";
-import Cam from "./components/Cam";
-import Env from "./components/Env";
-import Ground from "./components/Ground";
-import Config from "./Config";
-import { MathUtils } from "three";
-import Mod from "./components/Model";
-import { AppCtx } from "./Helper";
-import { ModDirConfig } from "./AssetsConfig";
+import { Html, softShadows } from "@react-three/drei"
+import React, { Suspense, useContext, useEffect, useRef, useState } from "react"
+import { Canvas } from "react-three-fiber"
+import Cam from "./components/Cam"
+import Env from "./components/Env"
+import Ground from "./components/Ground"
+import Config from "./Config"
+import { MathUtils } from "three"
+import Mod from "./components/Model"
+import { AppCtx } from "./Helper"
+import { fbxFiles, ModDirConfig } from "./AssetsConfig"
 export default React.memo(({ action, view }) => {
-    const modelTree = useRef([]);
-    const planeTree = useRef([]);
-    const { weather, tf, flagDetail, toggle } = useContext(AppCtx);
-    const assetPrefix = ModDirConfig[localStorage.getItem("projName")];
-    const resourceList = [
-        `private_models/${assetPrefix}/DX2.FBX`,
-        `private_models/${assetPrefix}/DM.FBX`,
-        `private_models/${assetPrefix}/DJ1.FBX`,
-        `private_models/${assetPrefix}/DJ2.FBX`,
-        `private_models/${assetPrefix}/DJ3.FBX`,
-        `private_models/${assetPrefix}/DJ6.FBX`,
-    ];
+    const modelTree = useRef([])
+    const planeTree = useRef([])
+    const { weather, tf, flagDetail, toggle } = useContext(AppCtx)
+    const assetPrefix = ModDirConfig[localStorage.getItem("projName")]
+    // const resourceList = [
+    //     `private_models/${assetPrefix}/DX2.FBX`,
+    //     `private_models/${assetPrefix}/DM.FBX`,
+    //     `private_models/${assetPrefix}/DJ1.FBX`,
+    //     `private_models/${assetPrefix}/DJ2.FBX`,
+    //     `private_models/${assetPrefix}/DJ3.FBX`,
+    //     `private_models/${assetPrefix}/DJ6.FBX`,
+    // ]
+    const resourceList = fbxFiles[`${assetPrefix}`].map(f => `private_models/${assetPrefix}/${f}`)
+    console.log(resourceList)
     return (
         <Canvas {...Config}>
             <Suspense fallback={<Loading />}>
@@ -54,21 +56,21 @@ export default React.memo(({ action, view }) => {
             <Env />
             <Cam />
         </Canvas>
-    );
-});
+    )
+})
 const Assets = React.memo(({ pathList, mt, pt }) => {
     return (
         <Suspense fallback={<Loading />}>
             {pathList.map((path) => {
-                return <Mod key={MathUtils.generateUUID()} path={path} mt={mt} pt={pt} />;
+                return <Mod key={MathUtils.generateUUID()} path={path} mt={mt} pt={pt} />
             })}
         </Suspense>
-    );
-});
+    )
+})
 function Loading() {
     return (
         <Html zIndexRange={[999999, 999999]} className="loading" center>
             <div className="center-box">资源加载中,请稍后...</div>
         </Html>
-    );
+    )
 }

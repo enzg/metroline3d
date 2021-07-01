@@ -1,15 +1,15 @@
-import React, { useContext, useRef, useEffect, useMemo, useState } from "react";
-import { Row, Col, Card, Image, List, Form, Radio, Switch, Button } from "antd";
-import { AppCtx, get, post } from "../Helper";
-import { AppConfig } from "../Config";
-import { CheckCircleOutlined, CloseOutlined, CloseCircleFilled } from "@ant-design/icons";
-import { Line } from "@ant-design/charts";
-import Draggable from "react-draggable";
-import FormItem from "antd/lib/form/FormItem";
-import { ModDirConfig } from "../AssetsConfig";
+import React, { useContext, useRef, useEffect, useMemo, useState } from "react"
+import { Row, Col, Card, Image, List, Form, Radio, Switch, Button } from "antd"
+import { AppCtx, get, post } from "../Helper"
+import { AppConfig } from "../Config"
+import Icon, { CheckCircleOutlined, CloseOutlined, CloseCircleFilled, CarryOutTwoTone } from "@ant-design/icons"
+import { Line } from "@ant-design/charts"
+import Draggable from "react-draggable"
+import FormItem from "antd/lib/form/FormItem"
+import { ModDirConfig } from "../AssetsConfig"
 
 export const CardGrid = ({ dataSource, action }) => {
-    const cardStyle = { height: "18vh", overflowY: "auto" };
+    const cardStyle = { height: "18vh", overflowY: "auto" }
     return (
         <Card size="small" bordered={false} style={cardStyle}>
             {dataSource.map((item) => {
@@ -31,35 +31,35 @@ export const CardGrid = ({ dataSource, action }) => {
                                         action.current[0] &&
                                         action.current[0].act.indexOf("SELECT") !== -1
                                     ) {
-                                        return;
+                                        return
                                     }
                                     action.current.unshift({
                                         act: "MOD_SELECT",
                                         url: `${item.icon}.FBX`,
                                         detail: { name: `${item.name}`, color: "" },
-                                    });
+                                    })
                                 }}
                             />
                             <h5>{item.name}</h5>
                         </div>
                     </Card.Grid>
-                );
+                )
             })}
         </Card>
-    );
-};
+    )
+}
 
 export function MpsAndRisksList({ action }) {
-    const [dataSource, setDataSource] = useState({ mpsList: [], riskList: [] });
-    let guid = localStorage.getItem("guid");
+    const [dataSource, setDataSource] = useState({ mpsList: [], riskList: [] })
+    let guid = localStorage.getItem("guid")
     useMemo(() => {
         post({
             url: AppConfig.url.postUnpublishMpsAndRisk,
             data: { guid, access_token: localStorage.getItem("token") },
         }).then((data) => {
-            setDataSource(data.data);
-        });
-    }, [guid]);
+            setDataSource(data.data)
+        })
+    }, [guid])
     return (
         <div
             className="hide-scrollbar"
@@ -82,7 +82,7 @@ export function MpsAndRisksList({ action }) {
                                 action.current[0] &&
                                 action.current[0].act.indexOf("SELECT") !== -1
                             ) {
-                                return;
+                                return
                             }
                             action.current.unshift({
                                 act: "FLAG_SELECT",
@@ -93,10 +93,10 @@ export function MpsAndRisksList({ action }) {
                                     bimId: item.id,
                                     type: item.type,
                                 },
-                            });
-                            let updateDataSource = { ...dataSource };
-                            updateDataSource["mpsList"].splice(index, 1);
-                            setDataSource(updateDataSource);
+                            })
+                            let updateDataSource = { ...dataSource }
+                            updateDataSource["mpsList"].splice(index, 1)
+                            setDataSource(updateDataSource)
                         }}
                     >
                         <List.Item.Meta
@@ -118,7 +118,7 @@ export function MpsAndRisksList({ action }) {
                                 action.current[0] &&
                                 action.current[0].act.indexOf("SELECT") !== -1
                             ) {
-                                return;
+                                return
                             }
                             action.current.unshift({
                                 act: "FLAG_SELECT",
@@ -132,10 +132,10 @@ export function MpsAndRisksList({ action }) {
                                     bimId: item.id,
                                     type: item.type,
                                 },
-                            });
-                            let updateDataSource = { ...dataSource };
-                            updateDataSource["riskList"].splice(index, 1);
-                            setDataSource(updateDataSource);
+                            })
+                            let updateDataSource = { ...dataSource }
+                            updateDataSource["riskList"].splice(index, 1)
+                            setDataSource(updateDataSource)
                         }}
                     >
                         <List.Item.Meta
@@ -146,25 +146,35 @@ export function MpsAndRisksList({ action }) {
                 )}
             />
         </div>
-    );
+    )
 }
 
 export const ProjGrid = React.memo(({ changeProj }) => {
-    const [dataSource, setSource] = useState([]);
+    const [dataSource, setSource] = useState([])
 
     useEffect(() => {
         // get buildings info frome server
         get({
-            url: AppConfig.url.getAllScenes,
-            params: { "param.access_token": localStorage.getItem("token") },
+            // url: AppConfig.url.getAllScenes,
+            url: AppConfig.url.getAllProjs,
+            params: {
+                "param.access_token": localStorage.getItem("token"),
+                "param.parentId": 0,
+                "param.type": 5
+            },
         })
             .then((data) => {
-                setSource(data.data.scenes);
+                setSource(
+                    [
+                        ...data.data.filter(item => Object.keys(ModDirConfig).includes(item.PrjName)),
+                        ...data.data.filter(item => !Object.keys(ModDirConfig).includes(item.PrjName)),
+                    ]
+                )
             })
             .catch(() => {
-                setSource([]);
-            });
-    }, []);
+                setSource([])
+            })
+    }, [])
     return (
         <Card
             size="small"
@@ -184,21 +194,30 @@ export const ProjGrid = React.memo(({ changeProj }) => {
                         <div
                             style={{ display: "grid", placeItems: "center" }}
                             onClick={(e) => {
-                                e.stopPropagation();
-                                changeProj(item.name);
-                                localStorage.setItem("guid", item.guid || "0");
-                                localStorage.setItem("projName", item.name || "0");
-                                window.location.reload();
+                                e.stopPropagation()
+                                // changeProj(item.name)
+                                changeProj(item.PrjName)
+                                localStorage.setItem("guid", item.PrjGuid || "0")
+                                localStorage.setItem("projName", item.PrjName || "0")
+                                window.location.reload()
                             }}
                         >
-                            <Image
-                                preview={false}
-                                width={52}
-                                height={52}
-                                fallback={AppConfig.fallbackImage}
-                                src={`${item.asset}.png`}
-                                onClick={() => {}}
-                            />
+                            {
+                                Object.keys(ModDirConfig).includes(item.PrjName) ? <div style={{
+                                    height: 52,
+                                    width: 52,
+                                    backgroundColor: '#476ECC'
+                                }}></div> : <Image
+
+                                    preview={false}
+                                    width={52}
+                                    height={52}
+                                    fallback={AppConfig.fallbackImage}
+                                    src={`${item.asset}.png`}
+                                    onClick={() => { }}
+                                />
+                            }
+
                             <a
                                 style={{
                                     textDecoration: "none",
@@ -209,20 +228,20 @@ export const ProjGrid = React.memo(({ changeProj }) => {
                                     color: "#fff",
                                     width: "60px",
                                 }}
-                                title={item.name}
+                                title={item.PrjName}
                             >
-                                {item.name}
+                                {item.PrjName}
                             </a>
                         </div>
                     </Card.Grid>
-                );
+                )
             })}
         </Card>
-    );
-});
+    )
+})
 
 export function SceneSetting({ action }) {
-    const { weather, setWeather, setTf } = useContext(AppCtx);
+    const { weather, setWeather, setTf } = useContext(AppCtx)
     return (
         <Card size="small" bordered={false} style={{ height: "12vh" }}>
             <Row gutter={[10, 10]}>
@@ -267,8 +286,8 @@ export function SceneSetting({ action }) {
                                     .forEach((flag) => {
                                         checked
                                             ? flag.classList.remove("hide")
-                                            : flag.classList.add("hide");
-                                    });
+                                            : flag.classList.add("hide")
+                                    })
                             }}
                         />
                     </div>
@@ -289,8 +308,8 @@ export function SceneSetting({ action }) {
                                 document.querySelectorAll(".flag").forEach((flag) => {
                                     checked
                                         ? flag.classList.remove("hide")
-                                        : flag.classList.add("hide");
-                                });
+                                        : flag.classList.add("hide")
+                                })
                             }}
                         />
                     </div>
@@ -309,15 +328,15 @@ export function SceneSetting({ action }) {
                             defaultChecked
                             onChange={(checked) => {
                                 if (checked) {
-                                    action.current.unshift({ act: "SHOW_FLAG" });
+                                    action.current.unshift({ act: "SHOW_FLAG" })
                                 } else {
-                                    action.current.unshift({ act: "HIDE_FLAG" });
+                                    action.current.unshift({ act: "HIDE_FLAG" })
                                 }
                                 document.querySelectorAll(".flag").forEach((flag) => {
                                     checked
                                         ? flag.classList.remove("hide")
-                                        : flag.classList.add("hide");
-                                });
+                                        : flag.classList.add("hide")
+                                })
                             }}
                         />
                     </div>
@@ -335,7 +354,7 @@ export function SceneSetting({ action }) {
                             checkedChildren={<CheckCircleOutlined />}
                             defaultChecked={false}
                             onChange={(checked) => {
-                                checked ? setTf(true) : setTf(false);
+                                checked ? setTf(true) : setTf(false)
                             }}
                         />
                     </div>
@@ -345,21 +364,21 @@ export function SceneSetting({ action }) {
                 <Col span={8}></Col>
             </Row>
         </Card>
-    );
+    )
 }
 
 export function FlagDetail({ action, bimId, type, name }) {
-    const [mpsDetail, setMpsDetail] = useState({});
-    const [lineData, setLineData] = useState([]);
-    const [riskDetail, setRiskDetail] = useState({});
+    const [mpsDetail, setMpsDetail] = useState({})
+    const [lineData, setLineData] = useState([])
+    const [riskDetail, setRiskDetail] = useState({})
     useMemo(() => {
         if (`${type}` === "1") {
             post({
                 url: AppConfig.url.postMps,
                 data: { id: bimId, access_token: localStorage.getItem("token") },
             }).then((data) => {
-                setMpsDetail(data.data);
-            });
+                setMpsDetail(data.data)
+            })
             post({
                 url: AppConfig.url.postDataByMpsId,
                 data: {
@@ -369,18 +388,18 @@ export function FlagDetail({ action, bimId, type, name }) {
                 },
             }).then((data) => {
                 console.log(data)
-                setLineData(data.data);
-            });
+                setLineData(data.data)
+            })
         } else if (`${type}` === "2") {
             post({
                 url: AppConfig.url.postRiskSource,
                 data: { id: bimId, access_token: localStorage.getItem("token") },
             }).then((data) => {
-                console.log(data);
-                setRiskDetail(data.data);
-            });
+                console.log(data)
+                setRiskDetail(data.data)
+            })
         }
-    }, []);
+    }, [])
     return (
         <div
             style={{
@@ -490,7 +509,7 @@ export function FlagDetail({ action, bimId, type, name }) {
                 </Card>
             </Draggable>
         </div>
-    );
+    )
 }
 const closeButtonStyle = {
     border: "none",
@@ -498,18 +517,18 @@ const closeButtonStyle = {
     top: "2px",
     right: "2px",
     zIndex: 22222223,
-};
+}
 const X1 = () => {
-    const { toggle } = useContext(AppCtx);
+    const { toggle } = useContext(AppCtx)
     return (
         <Button
             onClick={() => {
-                toggle(false);
+                toggle(false)
                 // document.querySelector('.detail-panel').classList.add('hide')
             }}
             ghost
             style={closeButtonStyle}
             icon={<CloseCircleFilled />}
         />
-    );
-};
+    )
+}
