@@ -1,5 +1,5 @@
-import React, { useContext, useState,useEffect } from "react";
-import { Button, Card, Col, Form, Input, Radio, Row, Switch, Tabs, Divider } from "antd";
+import React, { useContext, useState, useEffect } from "react"
+import { Button, Card, Col, Form, Input, Radio, Row, Switch, Tabs, Divider } from "antd"
 import {
     CheckOutlined,
     CloseCircleFilled,
@@ -8,7 +8,7 @@ import {
     CopyOutlined,
     SaveFilled,
     MinusCircleFilled,
-} from "@ant-design/icons";
+} from "@ant-design/icons"
 import {
     basicMenu,
     vehicleMenu,
@@ -17,19 +17,19 @@ import {
     bridgeMenu,
     eventMenu,
     Menus,
-} from "./Config";
+} from "./Config"
 import {
     CardGrid,
     FlagDetail,
     MpsAndRisksList,
     ProjGrid,
     SceneSetting,
-} from "./components/Page";
-import Draggable from "react-draggable";
-import StreamGraph from "./components/StreamGraph";
-import { CompactPicker } from "react-color";
-import { AppCtx } from "./Helper";
-import { save } from "./Store";
+} from "./components/Page"
+import Draggable from "react-draggable"
+import StreamGraph from "./components/StreamGraph"
+import { CompactPicker } from "react-color"
+import { AppCtx } from "./Helper"
+import { save } from "./Store"
 import copy from 'copy-to-clipboard'
 const basicStyle = {
     width: "18vw",
@@ -37,30 +37,30 @@ const basicStyle = {
     top: "1vh",
     left: "1vw",
     zIndex: 22222222,
-};
+}
 const closeButtonStyle = {
     border: "none",
     position: "absolute",
     top: "2px",
     right: "2px",
     zIndex: 22222223,
-};
+}
 export default ({ action, view }) => {
-    const [shield, showShield] = useState(false);
-    const { flagDetail } = useContext(AppCtx);
-    const [projName, setProjName] = useState(localStorage.getItem("projName"));
+    const [shield, showShield] = useState(false)
+    const { flagDetail } = useContext(AppCtx)
+    const [projName, setProjName] = useState(localStorage.getItem("projName"))
     useEffect(() => {
-        const keyup = (e)=>{
+        const keyup = (e) => {
             // q key
-            if(e.keyCode === 81){
+            if (e.keyCode === 81) {
                 document.querySelector(".top-hud").classList.toggle('hide')
             }
         }
         window.addEventListener('keyup', keyup)
-        return ()=>{
+        return () => {
             window.removeEventListener('keyup', keyup)
         }
-    },[])
+    }, [])
     return (
         <>
             <div
@@ -73,8 +73,8 @@ export default ({ action, view }) => {
                 <div className="action">
                     <div>
                         {!view &&
-                        <Button onClick={()=>{
-                            copy(`${location.host}?projName=${localStorage.getItem('projName')}&guid=${localStorage.getItem('guid')}`)
+                            <Button onClick={() => {
+                                copy(`${location.host}?projName=${localStorage.getItem('projName')}&guid=${localStorage.getItem('guid')}`)
                             }} icon={<CopyOutlined />}>复制分享链接</Button>
                         }
                         <Button type="text">
@@ -83,8 +83,8 @@ export default ({ action, view }) => {
                         <Button
                             onClick={() => {
                                 save(localStorage.getItem("guid")).then((data) => {
-                                    console.log(data);
-                                });
+                                    console.log(data)
+                                })
                             }}
                             icon={<SaveFilled />}
                         >
@@ -178,7 +178,7 @@ export default ({ action, view }) => {
                         className="card-position-wrap"
                         style={{ ...basicStyle, top: "80vh" }}
                     >
-                        <div className="card-title-wrap" onClick={()=>{
+                        <div className="card-title-wrap" onClick={() => {
                             showShield(true)
                             action.current.unshift({ act: "SHIELD" })
                             document.querySelector(".top-hud").classList.add("hide")
@@ -189,7 +189,7 @@ export default ({ action, view }) => {
                         className="card-position-wrap"
                         style={{ ...basicStyle, top: "83vh" }}
                     >
-                        <div className="card-title-wrap" onClick={() =>{
+                        <div className="card-title-wrap" onClick={() => {
                             showShield(false)
                             action.current.unshift({ act: "GEO_SELECT" })
                             document.querySelector(".top-hud").classList.add("hide")
@@ -200,13 +200,13 @@ export default ({ action, view }) => {
                         style={{ ...basicStyle, top: "86vh" }}
                     >
                         <div className="card-title-wrap">
-                <Input.Search
-                    placeholder="查找BIM标识点"
-                    onSearch={(evt) => {
-                        action.current.unshift({ act: "FIND", key: `${evt}` });
-                    }}
-                    enterButton
-                />
+                            <Input.Search
+                                placeholder="查找BIM标识点"
+                                onSearch={(evt) => {
+                                    action.current.unshift({ act: "FIND", key: `${evt}` })
+                                }}
+                                enterButton
+                            />
                         </div>
 
                     </div>
@@ -250,7 +250,7 @@ export default ({ action, view }) => {
                                 onChange={(evt) => {
                                     action.current.unshift({
                                         act: evt.target.value.toUpperCase(),
-                                    });
+                                    })
                                 }}
                             >
                                 <Radio.Button value="translate">平移</Radio.Button>
@@ -263,21 +263,21 @@ export default ({ action, view }) => {
                                 action.current.unshift({
                                     act: "CHANGE_COLOR",
                                     color: evt.hex,
-                                });
+                                })
                             }}
                         />
                         <Divider />
                         <Button
                             onClick={() => {
                                 // just save the store in local storage.
-                                action.current.unshift({ act: "SAVE" });
+                                action.current.unshift({ act: "SAVE" })
                             }}
                         >
                             保存
                         </Button>
                         <Button
                             onClick={() => {
-                                action.current.unshift({ act: "DELETE" });
+                                action.current.unshift({ act: "DELETE" })
                             }}
                         >
                             删除
@@ -294,39 +294,39 @@ export default ({ action, view }) => {
                 />
             )}
         </>
-    );
-};
+    )
+}
 const X0 = ({ action }) => (
     <Button
         onClick={() => {
-            action.current.unshift({ act: "DETACH" });
-            document.querySelector(".ctrl-panel").classList.add("hide");
+            action.current.unshift({ act: "DETACH" })
+            document.querySelector(".ctrl-panel").classList.add("hide")
         }}
         ghost
         style={closeButtonStyle}
         icon={<CloseCircleFilled />}
     />
-);
+)
 
 const X2 = ({ action }) => (
     <Button
         onClick={() => {
-            action.current.unshift({ act: "GEO_UNSELECT" });
-            document.querySelector(".geo-panel").classList.add("hide");
-            document.querySelector(".top-hud").classList.remove("hide");
+            action.current.unshift({ act: "GEO_UNSELECT" })
+            document.querySelector(".geo-panel").classList.add("hide")
+            document.querySelector(".top-hud").classList.remove("hide")
         }}
         ghost
         style={closeButtonStyle}
         icon={<CloseCircleFilled />}
     />
-);
+)
 
 function Route({ link, linkTo, action, changeProj }) {
     if (link === "GEO_INFO") {
-        action.current.unshift({ act: "GEO_SELECT" });
-        return null;
+        action.current.unshift({ act: "GEO_SELECT" })
+        return null
     } else if (link === "FIND_FLAG") {
-        document.querySelector(".top-hud").classList.remove("hide");
+        document.querySelector(".top-hud").classList.remove("hide")
         return (
             <Card
                 size="small"
@@ -336,12 +336,12 @@ function Route({ link, linkTo, action, changeProj }) {
                 <Input.Search
                     placeholder="查找BIM标识点"
                     onSearch={(evt) => {
-                        action.current.unshift({ act: "FIND", key: `${evt}` });
+                        action.current.unshift({ act: "FIND", key: `${evt}` })
                     }}
                     enterButton
                 />
             </Card>
-        );
+        )
     } else if (link === "MOD_LIB") {
         return (
             <Card size="small" title="模型库" style={basicStyle}>
@@ -367,14 +367,14 @@ function Route({ link, linkTo, action, changeProj }) {
                     </Tabs.TabPane>
                 </Tabs>
             </Card>
-        );
+        )
     } else if (link === "ADD_FLAG") {
         return (
             <Card size="small" title="BIM标识" style={{ ...basicStyle, height: "70vh" }}>
                 <X linkTo={linkTo} />
                 <MpsAndRisksList action={action} />
             </Card>
-        );
+        )
     } else if (link === "SCENE_SETTING") {
         return (
             <Card
@@ -385,7 +385,7 @@ function Route({ link, linkTo, action, changeProj }) {
                 <X linkTo={linkTo} />
                 <SceneSetting style={basicStyle} action={action} />
             </Card>
-        );
+        )
     } else if (link === "PROJ_MANAGE") {
         return (
             <Card
@@ -402,9 +402,9 @@ function Route({ link, linkTo, action, changeProj }) {
                 <X linkTo={linkTo} />
                 <ProjGrid action={action} changeProj={changeProj} />
             </Card>
-        );
+        )
     } else if (link === "SHOW_SHIELD") {
-        console.log(link);
+        console.log(link)
         return (
             <Card
                 className="geo-panel"
@@ -421,9 +421,9 @@ function Route({ link, linkTo, action, changeProj }) {
                 <X2 action={action} />
                 <StreamGraph shield={true} />
             </Card>
-        );
+        )
     }
-    return null;
+    return null
 }
 function X({ linkTo }) {
     const closeButtonStyle = {
@@ -432,16 +432,16 @@ function X({ linkTo }) {
         top: "2px",
         right: "2px",
         zIndex: 22222223,
-    };
+    }
     return (
         <Button
             onClick={() => {
-                linkTo(null);
-                document.querySelector(".top-hud").classList.remove("hide");
+                linkTo(null)
+                document.querySelector(".top-hud").classList.remove("hide")
             }}
             ghost
             style={closeButtonStyle}
             icon={<CloseCircleFilled />}
         />
-    );
+    )
 }

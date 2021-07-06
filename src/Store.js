@@ -1,7 +1,7 @@
-import produce from "immer";
-import React from "react";
-import { AppConfig } from "./Config";
-import { post } from "./Helper";
+import produce from "immer"
+import React from "react"
+import { AppConfig } from "./Config"
+import { post } from "./Helper"
 let template = {
   key: "", // id
   detial: {},
@@ -9,58 +9,61 @@ let template = {
   rotate: [],
   scale: [],
   url: "", // fbx path
-};
-let map = JSON.parse(localStorage.getItem("Map") || "[]");
+}
+let map = JSON.parse(localStorage.getItem("Map") || "[]")
 
 export function all() {
-  return map;
+  return map
 }
 
 export function add(item) {
   map = produce(map, (d) => {
-    d.push(item);
-  });
+    d.push(item)
+  })
   setItem(map).then((ret) => {
     //console.log('added:', ret, map)
-  });
+  })
 }
 
 export function remove({ key }) {
   map = produce(map, (d) => {
-    let index = d.findIndex((i) => i.key === key);
+    let index = d.findIndex((i) => i.key === key)
     if (index !== -1) {
-      d.splice(index, 1);
+      d.splice(index, 1)
     }
-  });
+  })
   setItem(map).then((ret) => {
-    console.log("remove:", ret, map);
-  });
+    console.log("remove:", ret, map)
+  })
 }
 export function update(item) {
   map = produce(map, (d) => {
-    let index = d.findIndex((i) => i.key === item.key);
-    if (index !== -1) d.splice(index, 1, item);
-  });
+    let index = d.findIndex((i) => i.key === item.key)
+    if (index !== -1) d.splice(index, 1, item)
+  })
   setItem(map).then((ret) => {
-    console.log("update:", ret, map);
-  });
+    console.log("update:", ret, map)
+  })
 }
 export async function save(guid) {
-  if (guid === "0") return;
-  console.log("start saving:", guid);
-  let buildingData = await formatBuildingStore(guid);
+  if (guid === "0") return
+  console.log("start saving:", guid)
+  let buildingData = await formatBuildingStore(guid)
   return post({
     url: AppConfig.url.saveBuildings,
-    data: { BuildingPointList: buildingData },
-  });
+    data: {
+      access_token: localStorage.getItem("token"),
+      BuildingPointList: buildingData
+    },
+  })
 }
 export function clean() {
   map = produce(map, (d) => {
-    d.splice(0, d.length);
-  });
+    d.splice(0, d.length)
+  })
   return setItem(map).then((ret) => {
-    console.log("clean all");
-  });
+    console.log("clean all")
+  })
 }
 /*
 
@@ -89,7 +92,7 @@ export function clean() {
 */
 const formatBuildingStore = async function (guid) {
   return new Promise((ok, err) => {
-    let localDataMap = JSON.parse(localStorage.getItem("Map") || "[]");
+    let localDataMap = JSON.parse(localStorage.getItem("Map") || "[]")
     let ret = localDataMap.map((item) => {
       return {
         guid,
@@ -99,16 +102,16 @@ const formatBuildingStore = async function (guid) {
         buildingDirection: JSON.stringify(item.rotation),
         buildingZoom: JSON.stringify(item.scale),
         mainColor: `${item.detail.color}`,
-      };
-    });
-    console.log(ret);
-    ok(ret);
-  });
-};
+      }
+    })
+    console.log(ret)
+    ok(ret)
+  })
+}
 const setItem = async function (jsonData) {
   return new Promise((ok, err) => {
-    localStorage.setItem("Map", JSON.stringify(jsonData));
-    ok({ status: 200 });
-  });
-};
+    localStorage.setItem("Map", JSON.stringify(jsonData))
+    ok({ status: 200 })
+  })
+}
 
